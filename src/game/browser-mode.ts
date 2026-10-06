@@ -1,5 +1,4 @@
-export const MOBILE_LANDSCAPE =
-  "(orientation: landscape) and (max-height: 540px) and (pointer: coarse)";
+export const LANDSCAPE_QUERY = "(orientation: landscape)";
 
 type LockableOrientation = ScreenOrientation & {
   lock?: (orientation: "landscape") => Promise<void>;

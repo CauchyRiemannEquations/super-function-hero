@@ -47,7 +47,7 @@ test("every gate has a CORE link in the same authored chunk", () => {
     for (const gate of event.layout.filter((o) => o.kind === "gate"))
       assert.ok(cores.includes(event.namespace + ":" + gate.link));
   assert.equal(new Set(cores).size, REQUIRED_CORES);
-  assert.equal(DURATION, 60);
+  assert.equal(DURATION, 150);
 });
 test("closed gates and ceiling use swept solid collision; open gates are passable", () => {
   const gate = makeObject(

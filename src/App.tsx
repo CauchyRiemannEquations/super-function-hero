@@ -1,9 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
-  ArrowUpRight,
-  AudioLines,
   ChevronRight,
-  CircleHelp,
   Heart,
   Maximize2,
   Pause,
@@ -12,8 +9,6 @@ import {
   Volume2,
   VolumeX,
   X,
-  Zap,
-  Flag,
   Trophy,
 } from "lucide-react";
 import { Game, INITIAL, type Snapshot } from "./game/engine";
@@ -22,8 +17,10 @@ import { SKILLS, type Skill } from "./game/trajectory";
 import Graph from "./components/SkillGraph";
 import MobileSkills from "./components/MobileSkills";
 import TitleScreen from "./components/TitleScreen";
+import { loadArt } from "./game/assets";
+import RotateScreen from "./components/RotateScreen";
 import {
-  MOBILE_LANDSCAPE,
+  LANDSCAPE_QUERY,
   enterGameFullscreen,
   leaveGameFullscreen,
 } from "./game/browser-mode";
@@ -45,24 +42,24 @@ export default function App() {
     engine = useRef<Game | null>(null),
     arena = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<Snapshot>({ ...INITIAL });
+  const [artReady, setArtReady] = useState(false);
   const [muted, setMuted] = useState(false),
     [help, setHelp] = useState(false),
     [debug, setDebug] = useState(false);
   const [fullscreen, setFullscreen] = useState(false),
     [best, setBest] = useState(0);
-  const landscape = useMediaQuery(MOBILE_LANDSCAPE);
+  const landscape = useMediaQuery(LANDSCAPE_QUERY);
   const touch = useMediaQuery("(pointer: coarse)");
-  const immersive = landscape;
+  const immersive = true;
   useLayoutEffect(() => {
-    const scroll = window.scrollY;
-    document.body.classList.toggle("game-immersive", immersive);
-    engine.current?.setImmersive(immersive);
-    if (immersive) window.scrollTo(0, 0);
+    document.body.classList.add("game-immersive");
+    engine.current?.setImmersive(true);
+    engine.current?.setPlayAllowed(landscape);
+    window.scrollTo(0, 0);
     return () => {
       document.body.classList.remove("game-immersive");
-      if (immersive) window.scrollTo(0, scroll);
     };
-  }, [immersive]);
+  }, [landscape]);
   useEffect(() => {
     try {
       setBest(Number(localStorage.getItem("curve-run-best") || 0));
@@ -71,10 +68,17 @@ export default function App() {
     }
     const game = new Game(canvas.current!, setState);
     engine.current = game;
-    game.setImmersive(matchMedia(MOBILE_LANDSCAPE).matches);
+    game.setImmersive(true);
+    game.setPlayAllowed(matchMedia(LANDSCAPE_QUERY).matches);
+    let active = true;
+    void loadArt().then(() => {
+      game.artReady = true;
+      if (active) setArtReady(true);
+    });
     if (import.meta.env.DEV)
       (window as unknown as { __curveGame?: Game }).__curveGame = game;
     return () => {
+      active = false;
       game.dispose();
       engine.current = null;
       if (import.meta.env.DEV)
@@ -109,7 +113,7 @@ export default function App() {
     setHelp(false);
     engine.current?.start();
     if (landscape && arena.current)
-      void enterGameFullscreen(arena.current, true);
+      void enterGameFullscreen(arena.current, touch);
   };
   const exit = () => {
     setHelp(false);
@@ -130,71 +134,23 @@ export default function App() {
   };
   const full = async () => {
     if (document.fullscreenElement) await leaveGameFullscreen();
-    else if (arena.current) await enterGameFullscreen(arena.current, landscape);
+    else if (arena.current) await enterGameFullscreen(arena.current, touch);
   };
   const playable = state.phase === "playing";
   const chapter = CHAPTERS[state.chapter];
+  const remaining = Math.ceil(Math.max(0, DURATION - state.time));
   return (
-    <main className={`shell ${immersive ? "immersive" : ""}`}>
-      <header className="header">
-        <a className="brand" href="./" aria-label="Super Function Hero 홈">
-          <span className="brand-mark">
-            <Zap size={23} strokeWidth={2.5} />
-          </span>
-          <span>
-            <span className="brand-word">
-              SUPER FUNCTION <b>HERO</b>
-            </span>
-            <i />
-          </span>
-        </a>
-        <div className="header-right">
-          <span className="prototype">
-            <span /> PLAYABLE PROTOTYPE <b>01</b>
-          </span>
-          <span className="header-divider" />
-          <button className="text-button" onClick={openHelp}>
-            <CircleHelp size={17} />
-            플레이 가이드
-          </button>
-        </div>
-      </header>
-      <section className="intro">
-        <div>
-          <div className="eyebrow">
-            <span /> A LITTLE MATH. A LOT OF ACTION.
-          </div>
-          <h1>
-            함수를 타고,
-            <br className="mobile-break" /> <span>한계를 넘어.</span>
-            <span className="title-star">✳</span>
-          </h1>
-          <p>
-            곡선은 당신의 기술. 리듬은 당신의 무기.
-            <span className="desktop-copy">
-              {" "}
-              네 가지 함수로 옥상을 질주하세요.
-            </span>
-          </p>
-        </div>
-        <div className="mission-label">
-          <span className="mission-icon">
-            <Flag size={23} />
-          </span>
-          <div>
-            <span>RUN 01 / V0.2</span>
-            <strong>스카이라인 돌파</strong>
-            <small>60초 · CORE로 길을 여는 연속 코스</small>
-          </div>
-          <ArrowUpRight size={20} />
-        </div>
-      </section>
-
+    <main className="game-app immersive">
       <div
         className={`arena ${fullscreen ? "fullscreen" : ""} ${state.phase === "ready" ? "is-ready" : ""}`}
         ref={arena}
       >
-        <section className="game-stage" aria-label="게임 화면">
+        <section
+          className="game-stage"
+          aria-label="게임 화면"
+          inert={!landscape}
+          aria-hidden={!landscape}
+        >
           <canvas
             ref={canvas}
             aria-label="자동으로 달리는 캐릭터와 함수 궤적이 표시되는 횡스크롤 게임"
@@ -225,16 +181,16 @@ export default function App() {
               </strong>
             </div>
             <div className="stage-time">
-              <span className="hud-label">STAGE 01</span>
+              <span className="hud-label">
+                SECTION {String(state.chapter + 1).padStart(2, "0")}/04
+              </span>
               <div>
                 <span className="progress">
                   <i style={{ width: `${(state.time / DURATION) * 100}%` }} />
                 </span>
                 <strong>
-                  {String(
-                    Math.max(0, DURATION - Math.floor(state.time)),
-                  ).padStart(2, "0")}
-                  <small>s</small>
+                  {Math.floor(remaining / 60)}:
+                  {String(remaining % 60).padStart(2, "0")}
                 </strong>
               </div>
             </div>
@@ -266,11 +222,6 @@ export default function App() {
               )}
             </div>
           </div>
-          {touch && !landscape && playable && (
-            <span className="rotation-hint">
-              ↔ 가로로 돌리면 더 넓게 플레이할 수 있어요
-            </span>
-          )}
           {playable && (
             <div className="chapter-chip" key={`chapter-${state.chapter}`}>
               <span>0{state.chapter + 1} /</span>
@@ -284,7 +235,12 @@ export default function App() {
             </div>
           )}
           {state.phase === "ready" && !help && (
-            <TitleScreen start={start} help={openHelp} />
+            <TitleScreen
+              start={start}
+              help={openHelp}
+              ready={artReady}
+              best={best}
+            />
           )}
           {state.phase === "paused" && !help && (
             <div className="overlay">
@@ -425,190 +381,84 @@ export default function App() {
             <MobileSkills
               active={state.skill}
               queued={state.bufferedSkill}
-              enabled={playable}
+              enabled={playable && landscape}
+              showKeys={!touch}
               cast={(skill) => engine.current?.cast(skill)}
             />
           )}
-          <div className="stage-bottom">
-            <span>
-              <span className="live-dot" />
-              {state.phase === "ready"
-                ? "ROOFTOP DISTRICT"
-                : state.phase === "playing"
-                  ? chapter.tip
-                  : state.phase === "clear"
-                    ? "곡선으로 만든 당신의 첫 번째 러시"
-                    : "다음 움직임을 준비하세요."}
-            </span>
-            <span>01 — SEOUL SKYLINE</span>
-          </div>
-        </section>
-        <section className="controls" aria-label="함수 기술">
-          <div className="control-heading">
-            <span>
-              <span className="tiny-slash" /> CHOOSE YOUR MOVE
-            </span>
-            <small>
-              <span className="pc-hint">
-                키보드 <kbd>1</kbd>–<kbd>4</kbd> 또는{" "}
-              </span>
-              버튼을 탭하세요
-              <ChevronRight size={13} />
-            </small>
-          </div>
-          <div className="skill-grid">
-            {(Object.keys(SKILLS) as Skill[]).map((k) => (
-              <button
-                key={k}
-                className={`skill skill-${k} ${state.skill === k ? "active" : ""}`}
-                style={{ "--skill": SKILLS[k].color } as React.CSSProperties}
-                disabled={!playable}
-                aria-label={`${SKILLS[k].key} ${SKILLS[k].formula} ${SKILLS[k].name}`}
-                onPointerDown={(e) => {
-                  if (e.button !== 0) return;
-                  e.preventDefault();
-                  engine.current?.cast(k);
-                }}
-                onClick={(e) => {
-                  if (e.detail === 0) engine.current?.cast(k);
-                }}
-              >
-                <span className="skill-number">0{SKILLS[k].key}</span>
-                <Graph skill={k} className="skill-graph" />
-                <span className="skill-text">
-                  <strong>{SKILLS[k].formula}</strong>
-                  <span>{SKILLS[k].name}</span>
-                </span>
-                <kbd>{SKILLS[k].key}</kbd>
-                <span className="skill-indicator" />
+          {import.meta.env.DEV && landscape && (
+            <div className="debug">
+              <button className="debug-toggle" onClick={() => setDebug(!debug)}>
+                DEV {debug ? "−" : "+"}
               </button>
-            ))}
-          </div>
-          <div className="control-footer">
-            <span>
-              <Zap size={13} /> 타이밍을 맞추면 PERFECT, 흐름을 이으면 COMBO.
-            </span>
-            <span>
-              <AudioLines size={14} /> SOUND ON FOR THE FEEL
-            </span>
-          </div>
-        </section>
-      </div>
-      <section className="below">
-        <div className="design-note">
-          <span>THE RULE IS SIMPLE</span>
-          <p>
-            수학을 푸는 대신,
-            <br />
-            <strong>수학으로 움직이세요.</strong>
-          </p>
-        </div>
-        <div className="feature-note">
-          <span className="note-number">01</span>
-          <div>
-            <strong>보고, 누르고, 날아오르기.</strong>
-            <p>
-              함수 이름을 몰라도 괜찮아요.
-              <br />
-              그래프 모양이 다음 움직임의 힌트입니다.
-            </p>
-          </div>
-        </div>
-        <div className="feature-note">
-          <span className="note-number">02</span>
-          <div>
-            <strong>좋은 곡선은 좋은 콤보로.</strong>
-            <p>
-              어퍼컷에서 내려찍기로, 대시에서 웨이브로.
-              <br />
-              끊기지 않는 흐름을 찾아보세요.
-            </p>
-          </div>
-        </div>
-        <div className="best-record">
-          <Trophy size={18} />
-          <span>LOCAL BEST</span>
-          <strong>{best.toLocaleString().padStart(4, "0")}</strong>
-        </div>
-      </section>
-      <footer className="footer">
-        <span>
-          SUPER FUNCTION HERO <b>© 2026</b>
-        </span>
-        <span>
-          FOUR FUNCTIONS. INFINITE FLOW.<i>↗</i>
-        </span>
-      </footer>
-      {import.meta.env.DEV && (
-        <div className="debug">
-          <button className="debug-toggle" onClick={() => setDebug(!debug)}>
-            DEV {debug ? "−" : "+"}
-          </button>
-          {debug && (
-            <div className="debug-panel">
-              <code>
-                {state.fps.toFixed(0)} FPS · x {state.x.toFixed(1)} / y{" "}
-                {state.y.toFixed(1)}
-                <br />
-                {state.skill ?? state.motion} · {state.time.toFixed(2)}s
-              </code>
-              <label>
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    if (engine.current)
-                      engine.current.debug.hitboxes = e.target.checked;
-                  }}
-                />
-                Hitboxes
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    if (engine.current)
-                      engine.current.debug.invincible = e.target.checked;
-                  }}
-                />
-                무적
-              </label>
-              <label>
-                이동 속도
-                <select
-                  defaultValue="1"
-                  onChange={(e) => {
-                    if (engine.current)
-                      engine.current.debug.speed = Number(e.target.value);
-                  }}
-                >
-                  <option value="0.5">0.5×</option>
-                  <option value="1">1×</option>
-                  <option value="1.5">1.5×</option>
-                  <option value="2">2×</option>
-                </select>
-              </label>
-              <div className="debug-actions">
-                <button onClick={() => engine.current?.spawn("bot")}>
-                  지상 적
-                </button>
-                <button onClick={() => engine.current?.spawn("drone")}>
-                  공중 적
-                </button>
-                <button onClick={() => engine.current?.spawn("spike")}>
-                  장애물
-                </button>
-              </div>
-              <div className="debug-actions">
-                {(Object.keys(SKILLS) as Skill[]).map((k) => (
-                  <button key={k} onClick={() => engine.current?.cast(k)}>
-                    {SKILLS[k].formula}
-                  </button>
-                ))}
-              </div>
+              {debug && (
+                <div className="debug-panel">
+                  <code>
+                    {state.fps.toFixed(0)} FPS · x {state.x.toFixed(1)} / y{" "}
+                    {state.y.toFixed(1)}
+                    <br />
+                    {state.skill ?? state.motion} · {state.time.toFixed(2)}s
+                  </code>
+                  <label>
+                    <input
+                      type="checkbox"
+                      onChange={(e) => {
+                        if (engine.current)
+                          engine.current.debug.hitboxes = e.target.checked;
+                      }}
+                    />
+                    Hitboxes
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      onChange={(e) => {
+                        if (engine.current)
+                          engine.current.debug.invincible = e.target.checked;
+                      }}
+                    />
+                    무적
+                  </label>
+                  <label>
+                    이동 속도
+                    <select
+                      defaultValue="1"
+                      onChange={(e) => {
+                        if (engine.current)
+                          engine.current.debug.speed = Number(e.target.value);
+                      }}
+                    >
+                      <option value="0.5">0.5×</option>
+                      <option value="1">1×</option>
+                      <option value="1.5">1.5×</option>
+                      <option value="2">2×</option>
+                    </select>
+                  </label>
+                  <div className="debug-actions">
+                    <button onClick={() => engine.current?.spawn("bot")}>
+                      지상 적
+                    </button>
+                    <button onClick={() => engine.current?.spawn("drone")}>
+                      공중 적
+                    </button>
+                    <button onClick={() => engine.current?.spawn("spike")}>
+                      장애물
+                    </button>
+                  </div>
+                  <div className="debug-actions">
+                    {(Object.keys(SKILLS) as Skill[]).map((k) => (
+                      <button key={k} onClick={() => engine.current?.cast(k)}>
+                        {SKILLS[k].formula}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
-        </div>
-      )}
+        </section>
+        {!landscape && <RotateScreen fullscreen={() => void full()} />}
+      </div>
     </main>
   );
 }

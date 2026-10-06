@@ -18,6 +18,7 @@ export type SpawnSpec = {
   width?: number;
   height?: number;
   link?: string;
+  leadSeconds?: number;
 };
 export type WorldObject = Point & {
   id: number;
@@ -57,7 +58,7 @@ export function makeObject(
       : spec.kind === "ceiling"
         ? [190, 222]
         : spec.kind === "spike"
-          ? [64, 64]
+          ? [104, 56]
           : spec.kind === "fracture"
             ? [150, 18]
             : spec.kind === "impact"

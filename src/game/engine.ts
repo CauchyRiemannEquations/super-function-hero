@@ -1,4 +1,5 @@
 import { AudioFx } from "./audio";
+import { LANDSCAPE_QUERY } from "./browser-mode";
 import {
   SkillInputBuffer,
   INPUT_BUFFER_SECONDS,
@@ -14,11 +15,15 @@ import {
   type WorldObject,
 } from "./objects";
 import { drawObject } from "./render-objects";
+import { drawSprite } from "./assets";
 import {
   CHAPTERS,
   DURATION,
   ENCOUNTERS,
-  SPEED,
+  speedAt,
+  pacedSpec,
+  sceneryAt,
+  sectionAt,
   chapterAt,
   makeEnemy,
   LOWER_FLOOR,
@@ -125,6 +130,14 @@ export class Game {
   labels: Label[] = [];
   action: Action | null = null;
   audio = new AudioFx();
+  artReady = false;
+  private orientationMedia = window.matchMedia(LANDSCAPE_QUERY);
+  playAllowed = this.orientationMedia.matches;
+  get canPlay() {
+    return this.playAllowed && this.orientationMedia.matches;
+  }
+  private onOrientation = () =>
+    this.setPlayAllowed(this.orientationMedia.matches);
   debug = { hitboxes: false, invincible: false, speed: 1 };
   width = 1160;
   height = WORLD_HEIGHT;
@@ -159,6 +172,7 @@ export class Game {
   private reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
     .matches;
   private onKey = (e: KeyboardEvent) => {
+    if (!this.canPlay) return;
     if (
       e.target instanceof HTMLInputElement ||
       e.target instanceof HTMLSelectElement ||
@@ -196,6 +210,7 @@ export class Game {
     this.resize();
     window.addEventListener("keydown", this.onKey);
     document.addEventListener("visibilitychange", this.onVisibility);
+    this.orientationMedia.addEventListener("change", this.onOrientation);
     this.frame = requestAnimationFrame(this.loop);
   }
   private resize = () => {
@@ -204,10 +219,12 @@ export class Game {
     const oldAnchor = this.anchor;
     const controls =
       this.canvas.parentElement?.querySelector(".thumb-controls");
-    this.protectedBottom =
-      this.immersive && controls
-        ? Math.max(104, box.bottom - controls.getBoundingClientRect().top + 24)
-        : 0;
+    const controlBox = controls?.getBoundingClientRect();
+    this.protectedBottom = this.immersive
+      ? controlBox && controlBox.height > 0
+        ? Math.max(104, box.bottom - controlBox.top + 24)
+        : 116
+      : 0;
     const viewport = fitViewport(box.width, box.height, this.protectedBottom);
     this.width = viewport.width;
     this.viewHeight = viewport.height;
@@ -220,11 +237,20 @@ export class Game {
     this.immersive = value;
     this.resize();
   }
+  setPlayAllowed(value: boolean) {
+    this.playAllowed = value;
+    if (!value) {
+      this.input.clear();
+      this.state.bufferedSkill = null;
+      if (this.state.phase === "playing") this.pause();
+    }
+  }
   dispose() {
     cancelAnimationFrame(this.frame);
     this.resizeObserver.disconnect();
     window.removeEventListener("keydown", this.onKey);
     document.removeEventListener("visibilitychange", this.onVisibility);
+    this.orientationMedia.removeEventListener("change", this.onOrientation);
     this.audio.dispose();
   }
   emit() {
@@ -236,6 +262,7 @@ export class Game {
     this.notify({ ...this.state });
   }
   start() {
+    if (!this.artReady || !this.canPlay) return;
     this.audio.unlock();
     this.reset("playing");
   }
@@ -271,9 +298,11 @@ export class Game {
     this.input.clear();
     this.state.bufferedSkill = null;
     this.state.phase = "paused";
+    this.accumulator = 0;
     this.emit();
   }
   togglePause() {
+    if (!this.canPlay) return;
     if (this.state.phase === "playing") this.pause();
     else if (this.state.phase === "paused") {
       this.audio.unlock();
@@ -282,7 +311,7 @@ export class Game {
     }
   }
   cast(skill: Skill) {
-    if (this.state.phase !== "playing") return;
+    if (this.state.phase !== "playing" || !this.canPlay) return;
     const remaining = this.action
       ? SKILLS[this.action.skill].duration -
         this.action.elapsed +
@@ -351,7 +380,7 @@ export class Game {
     this.previous = now;
     this.tick += dt;
     this.state.fps += (1 / Math.max(dt, 0.001) - this.state.fps) * 0.04;
-    if (this.state.phase === "playing") {
+    if (this.state.phase === "playing" && this.canPlay) {
       this.effects(dt);
       if (this.hitstop > 0) this.hitstop -= dt;
       else {
@@ -368,7 +397,7 @@ export class Game {
         if (this.hitstop > 0) this.accumulator = 0;
       }
     }
-    this.render();
+    if (this.canPlay) this.render();
     this.publishTime += dt;
     if (this.publishTime > 0.06) {
       this.publishTime = 0;
@@ -406,6 +435,7 @@ export class Game {
     });
   }
   private update(dt: number) {
+    if (!this.canPlay) return;
     this.state.time += dt;
     if (
       this.state.route === "lower" &&
@@ -429,7 +459,7 @@ export class Game {
         this.objects.push(
           makeObject(
             ++this.id,
-            spec,
+            pacedSpec(spec, group.time),
             this.player.x,
             this.floor,
             group.namespace,
@@ -508,7 +538,7 @@ export class Game {
         }
       }
     } else {
-      this.player.x += SPEED * this.debug.speed * dt;
+      this.player.x += speedAt(this.state.time) * this.debug.speed * dt;
       if (this.player.y < this.floor) {
         this.state.motion = "fall";
         this.player.vy += 480 * dt;
@@ -559,7 +589,7 @@ export class Game {
     this.cameraY +=
       (Math.max(0, this.player.y - FLOOR) - this.cameraY) *
       (1 - Math.exp(-8 * dt));
-    if (this.state.combo > 0 && this.state.time - this.lastCombo > 6.5)
+    if (this.state.combo > 0 && this.state.time - this.lastCombo > 12)
       this.state.combo = 0;
     // End-window inputs start on this very simulation step, after the old
     // action's final collision/splash has been resolved.
@@ -869,12 +899,14 @@ export class Game {
   private background() {
     const c = this.ctx,
       w = this.width;
+    const palette = sceneryAt(this.state.time),
+      section = sectionAt(this.state.time);
     const gradient = c.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, "#edf0e9");
-    gradient.addColorStop(1, "#f6efd9");
+    gradient.addColorStop(0, palette.sky);
+    gradient.addColorStop(1, palette.haze);
     c.fillStyle = gradient;
     c.fillRect(0, this.cameraY, w, this.viewHeight);
-    c.strokeStyle = "#dde3d7";
+    c.strokeStyle = "#ffffff0b";
     c.lineWidth = 1;
     for (let x = 0; x < w; x += 58) {
       c.beginPath();
@@ -889,11 +921,11 @@ export class Game {
       c.stroke();
     }
     const sunX = w * 0.78 - ((this.camera * 0.015) % 100);
-    c.fillStyle = "#ffd58a";
+    c.fillStyle = palette.glass;
     c.beginPath();
     c.arc(sunX, 105, 48, 0, Math.PI * 2);
     c.fill();
-    c.strokeStyle = "#efc681";
+    c.strokeStyle = palette.glass + "60";
     c.lineWidth = 1;
     c.beginPath();
     c.arc(sunX, 105, 60, 0, Math.PI * 2);
@@ -904,7 +936,7 @@ export class Game {
           (w + 280)) -
         120;
       const y = 68 + (i % 3) * 33;
-      c.fillStyle = "#fffcf0";
+      c.fillStyle = palette.haze + "80";
       c.beginPath();
       c.roundRect(x, y, 70 + (i % 2) * 35, 13, 12);
       c.fill();
@@ -918,18 +950,15 @@ export class Game {
         const bh = 75 + ((((idx * 71 + 377) % 120) + 120) % 120),
           x = i * step - offset,
           y = 375 - bh;
-        c.fillStyle =
-          layer === 0
-            ? "#d8ded4"
-            : ["#c8ccc5", "#d9d5de", "#e4d4b7"][((idx % 3) + 3) % 3];
+        c.fillStyle = layer === 0 ? palette.far : palette.near;
         c.fillRect(x, y, step - 17, bh);
-        c.fillStyle = layer === 0 ? "#d0d7cc" : "#b4bdb5";
+        c.fillStyle = palette.detail;
         c.fillRect(x - 3, y, step - 11, 5);
         if (layer === 1) {
-          c.fillStyle = "#f0eddd";
+          c.fillStyle = palette.glass;
           for (let wx = x + 13; wx < x + step - 25; wx += 25)
             for (let wy = y + 18; wy < 352; wy += 25) c.fillRect(wx, wy, 9, 12);
-          c.strokeStyle = "#acb6ad";
+          c.strokeStyle = palette.detail;
           c.lineWidth = 2;
           c.beginPath();
           c.moveTo(x + 20, y);
@@ -937,15 +966,28 @@ export class Game {
           c.lineTo(x + 65, y - 15);
           c.lineTo(x + 65, y);
           c.stroke();
+          if (section.theme === "factory") {
+            c.fillStyle = palette.detail;
+            c.fillRect(x + 24, y - 42, 12, 42);
+            c.fillRect(x + 50, y - 28, 9, 28);
+            c.fillStyle = palette.haze + "45";
+            c.beginPath();
+            c.arc(x + 28, y - 50, 12, 0, Math.PI * 2);
+            c.fill();
+          }
+          if (section.theme === "city" || section.theme === "night") {
+            c.fillStyle = palette.accent;
+            c.fillRect(x + 8, y + 8, step - 40, 2);
+          }
         }
       }
     }
-    c.fillStyle = "#f4ead1";
+    c.fillStyle = palette.ground;
     const deck = this.floor + 28;
     c.fillRect(0, deck, w, this.viewHeight + this.cameraY - deck);
-    c.fillStyle = "#31484e";
+    c.fillStyle = palette.edge;
     c.fillRect(0, deck, w, 7);
-    c.fillStyle = "#cbd5b8";
+    c.fillStyle = palette.accent + "65";
     c.fillRect(0, deck + 8, w, 12);
     if (this.state.route === "lower") {
       const hole = this.crashX - this.camera;
@@ -960,7 +1002,7 @@ export class Game {
         this.floor - 48,
       );
     }
-    c.strokeStyle = "#dfd4b8";
+    c.strokeStyle = palette.detail + "70";
     c.lineWidth = 1;
     for (let y = deck + 36; y < this.viewHeight + this.cameraY; y += 27) {
       c.beginPath();
@@ -970,19 +1012,19 @@ export class Game {
     }
     for (let i = -1; i < w / 160 + 1; i++) {
       const x = i * 160 - (this.camera % 160);
-      c.strokeStyle = "#e0d5bd";
+      c.strokeStyle = palette.detail;
       c.beginPath();
       c.moveTo(x, deck + 20);
       c.lineTo(x - 38, this.viewHeight + this.cameraY);
       c.stroke();
-      c.fillStyle = "#b3bfa5";
+      c.fillStyle = palette.accent;
       c.fillRect(x + 47, deck + 10, 24, 3);
     }
     c.save();
     c.translate(w - 115, deck + 40);
-    c.fillStyle = "#778879";
+    c.fillStyle = palette.glass;
     c.font = "600 10px monospace";
-    c.fillText("ROOFTOP / 01", 0, 0);
+    c.fillText(section.theme.toUpperCase(), 0, 0);
     c.restore();
   }
   private drawEnemy(e: WorldObject, preview = false) {
@@ -994,6 +1036,32 @@ export class Game {
     c.translate(x, y);
     c.globalAlpha = e.dead ? Math.max(0, 1 - e.death / 0.55) : 1;
     if (e.dead) c.rotate(e.death * 6);
+    if (e.role === "enemy") {
+      const width = e.kind === "drone" ? 82 : 58,
+        height = e.kind === "drone" ? (82 * 478) / 1122 : (58 * 747) / 580;
+      const top = e.kind === "drone" ? -height / 2 : e.floor + 28 - y - height;
+      if (
+        drawSprite(
+          c,
+          e.kind === "drone" ? "drone" : "bot",
+          -width / 2,
+          top,
+          width,
+        )
+      ) {
+        if (!e.dead && !preview) {
+          c.strokeStyle = "#34dfca70";
+          c.lineWidth = 1.5;
+          c.setLineDash([3, 6]);
+          c.beginPath();
+          c.arc(0, 0, 35, 0, Math.PI * 2);
+          c.stroke();
+          c.setLineDash([]);
+        }
+        c.restore();
+        return;
+      }
+    }
     if (e.kind === "spike") {
       c.fillStyle = "#596365";
       c.fillRect(-28, 14, 56, 6);
@@ -1103,7 +1171,7 @@ export class Game {
       p = this.player,
       x = this.state.phase === "ready" ? this.width * 0.74 : p.x - this.camera;
     const active = this.action?.skill,
-      color = active ? SKILLS[active].color : "#ff704e";
+      color = active ? SKILLS[active].color : "#ff794b";
     c.fillStyle = "#314b4922";
     c.beginPath();
     c.ellipse(x, this.floor + 26, 24, 5, 0, 0, Math.PI * 2);
@@ -1127,7 +1195,7 @@ export class Game {
               : -0.08;
     c.rotate(angle);
     // A simple ink runner: white helmet, coral scarf, expressive stick limbs.
-    c.strokeStyle = "#263e45";
+    c.strokeStyle = "#261441";
     c.lineWidth = 6;
     c.beginPath();
     c.moveTo(0, -14);
@@ -1150,8 +1218,8 @@ export class Game {
     c.moveTo(0, -17);
     c.bezierCurveTo(-15, -20, -23, -8, -42, -18 + Math.sin(this.tick * 14) * 4);
     c.stroke();
-    c.fillStyle = "#fffdf1";
-    c.strokeStyle = "#263e45";
+    c.fillStyle = "#35224f";
+    c.strokeStyle = "#17112e";
     c.lineWidth = 3;
     c.beginPath();
     c.arc(3, -29, 13, 0, Math.PI * 2);
@@ -1161,7 +1229,7 @@ export class Game {
     c.beginPath();
     c.roundRect(2, -33, 15, 7, 4);
     c.fill();
-    c.fillStyle = "#a8d5bd";
+    c.fillStyle = "#32dce1";
     c.fillRect(10, -31, 4, 2);
     c.strokeStyle = color;
     c.lineWidth = 4;

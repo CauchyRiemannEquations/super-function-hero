@@ -1,0 +1,258 @@
+{
+  "checks": [
+    {
+      "name": "Landing header, intro, external cards, descriptions and footer are removed",
+      "passed": true
+    },
+    {
+      "name": "Desktop title fills viewport without scroll",
+      "passed": true,
+      "evidence": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "name": "Desktop Enter starts",
+      "passed": true
+    },
+    {
+      "name": "Desktop skill HUD is inside game and includes key hints",
+      "passed": true
+    },
+    {
+      "name": "Desktop key 1 fires line",
+      "passed": true
+    },
+    {
+      "name": "Desktop key 2 fires rise",
+      "passed": true
+    },
+    {
+      "name": "Desktop key 3 fires dive",
+      "passed": true
+    },
+    {
+      "name": "Desktop key 4 fires wave",
+      "passed": true
+    },
+    {
+      "name": "Narrow desktop portrait auto-pauses and ignores Escape/R/skills",
+      "passed": true,
+      "evidence": {
+        "before": {
+          "phase": "paused",
+          "hp": 3,
+          "score": 0,
+          "combo": 0,
+          "maxCombo": 0,
+          "kills": 0,
+          "perfects": 0,
+          "time": 0.16666666666666666,
+          "skill": "wave",
+          "bufferedSkill": null,
+          "chapter": 0,
+          "fps": 59.9910053715182,
+          "x": 251.42857142857144,
+          "y": 266.57624823560536,
+          "motion": "skill",
+          "casts": 1,
+          "hits": 0,
+          "waveChains": 0,
+          "parabolaCombos": 0,
+          "lastEvent": "WAVE FLOW",
+          "cores": 0,
+          "gates": 0,
+          "crashes": 0,
+          "route": "roof",
+          "floor": 348,
+          "failure": "",
+          "allowed": false
+        },
+        "blocked": {
+          "phase": "paused",
+          "hp": 3,
+          "score": 0,
+          "combo": 0,
+          "maxCombo": 0,
+          "kills": 0,
+          "perfects": 0,
+          "time": 0.16666666666666666,
+          "skill": "wave",
+          "bufferedSkill": null,
+          "chapter": 0,
+          "fps": 59.264490872044675,
+          "x": 251.42857142857144,
+          "y": 266.57624823560536,
+          "motion": "skill",
+          "casts": 1,
+          "hits": 0,
+          "waveChains": 0,
+          "parabolaCombos": 0,
+          "lastEvent": "WAVE FLOW",
+          "cores": 0,
+          "gates": 0,
+          "crashes": 0,
+          "route": "roof",
+          "floor": 348,
+          "failure": "",
+          "allowed": false
+        }
+      }
+    },
+    {
+      "name": "Landscape return stays paused until user resumes",
+      "passed": true
+    },
+    {
+      "name": "Resume preserves run and advances again",
+      "passed": true
+    },
+    {
+      "name": "150s course still clears with all CORE/Gates and normal HP",
+      "passed": true,
+      "evidence": {
+        "phase": "clear",
+        "hp": 3,
+        "score": 23288,
+        "combo": 64,
+        "maxCombo": 64,
+        "kills": 41,
+        "perfects": 41,
+        "time": 150.0000000000279,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 3,
+        "fps": 60,
+        "x": 28602.72158194399,
+        "y": 348,
+        "motion": "run",
+        "casts": 34,
+        "hits": 41,
+        "waveChains": 10,
+        "parabolaCombos": 8,
+        "lastEvent": "CORE BREAK",
+        "cores": 23,
+        "gates": 23,
+        "crashes": 4,
+        "route": "roof",
+        "floor": 348,
+        "failure": ""
+      }
+    },
+    {
+      "name": "Restart works",
+      "passed": true
+    },
+    {
+      "name": "Closed Gate Game Over remains intact",
+      "passed": true
+    },
+    {
+      "name": "Portrait has only rotation dialog and inert game",
+      "passed": true
+    },
+    {
+      "name": "Portrait cannot start via keyboard or direct controller calls",
+      "passed": true,
+      "evidence": {
+        "phase": "ready",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 60.65209166795127,
+        "x": 180,
+        "y": 348,
+        "motion": "run",
+        "casts": 0,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "",
+        "cores": 0,
+        "gates": 0,
+        "crashes": 0,
+        "route": "roof",
+        "floor": 348,
+        "failure": "",
+        "allowed": false
+      }
+    },
+    {
+      "name": "Mid-skill rotation freezes time/HP and discards queued input",
+      "passed": true,
+      "evidence": {
+        "phase": "paused",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.275,
+        "skill": "dive",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 57.76688532206814,
+        "x": 255.60000000000005,
+        "y": 336.1813271604938,
+        "motion": "hop",
+        "casts": 2,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "POWER DIVE",
+        "cores": 0,
+        "gates": 0,
+        "crashes": 0,
+        "route": "roof",
+        "floor": 348,
+        "failure": "",
+        "allowed": false
+      }
+    },
+    {
+      "name": "Mobile landscape return does not auto-resume",
+      "passed": true
+    },
+    {
+      "name": "Mobile resume retains progress and no delayed queued skill",
+      "passed": true
+    },
+    {
+      "name": "Small landscape has four uncut >=64px targets",
+      "passed": true
+    },
+    {
+      "name": "Return to title still fills game frame",
+      "passed": true
+    },
+    {
+      "name": "Portrait rotation block stays inside fullscreen arena",
+      "passed": true
+    },
+    {
+      "name": "Standalone also blocks portrait",
+      "passed": true
+    },
+    {
+      "name": "Standalone plays in landscape and hides DEV API",
+      "passed": true
+    },
+    {
+      "name": "No browser console errors",
+      "passed": true,
+      "evidence": []
+    }
+  ],
+  "errors": []
+}
