@@ -1813,6 +1813,207 @@ h1 > span:not(.title-star) {
   background: none;
   border: 0;
 }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.header-logo {
+  width: 140px;
+  height: 78px;
+  object-fit: contain;
+}
+.title-art {
+  background-size: cover;
+  background-position: center;
+}
+.title-screen.title-art {
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+.immersive .arena .game-tools button {
+  background: #211943d9;
+  color: #f2eaff;
+  border-color: #9982c8;
+}
+.title-logo {
+  position: absolute;
+  top: 4%;
+  left: 4%;
+  width: 51%;
+  height: auto;
+  max-height: 55%;
+  object-fit: contain;
+  object-position: left top;
+  filter: drop-shadow(0 5px 4px #15103555);
+}
+.title-launch {
+  position: absolute;
+  left: 6%;
+  bottom: 8%;
+}
+.title-launch > .title-kicker {
+  color: #faf3d6;
+  text-shadow: 0 1px 3px #1d143d;
+  font-size: 9px;
+}
+.title-launch p {
+  font: 900 15px "Barlow Condensed";
+  letter-spacing: 2px;
+  color: #211442;
+  margin: 8px 0 12px;
+}
+.title-launch .primary {
+  min-width: 210px;
+  background: linear-gradient(160deg, #fff564, #ffc22e);
+  color: #231040;
+  box-shadow:
+    0 4px 0 #d17b24,
+    0 0 0 2px #fff8ac;
+  border-radius: 15px;
+  font: 900 30px "Barlow Condensed";
+  padding: 10px 24px;
+}
+.title-launch .primary:disabled {
+  opacity: 0.7;
+}
+.title-launch .title-help {
+  background: #211443e8;
+  color: #eee6ff;
+  border: 2px solid #ad8bea;
+  box-shadow: 0 3px 0 #170c32;
+}
+.title-record {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: #fff0bc;
+  background: #1b123aca;
+  border: 1px solid #8872b7;
+  border-radius: 7px;
+  padding: 5px 10px;
+  width: max-content;
+}
+.title-record span {
+  font-size: 7px;
+  letter-spacing: 1px;
+}
+.title-record strong {
+  font: 800 17px "Barlow Condensed";
+}
+.title-launch small {
+  display: block;
+  margin-top: 7px;
+  font-size: 8px;
+  color: #fff7df;
+  text-shadow: 0 1px 3px #1b123a;
+}
+.title-art .object-legend > div {
+  background: #20173cdd;
+  border-width: 1.5px;
+  color: #c4f9ff;
+}
+.title-art .object-legend span {
+  color: #ece8fa;
+}
+.title-art .legend-hazard {
+  border-color: #ff8a65;
+}
+.title-art .legend-enemy {
+  border-color: #45e7da;
+}
+.title-art .legend-core {
+  border-color: #ffda6c;
+}
+.arena:not(.is-ready) .hud {
+  background: linear-gradient(#161333ed, #1b174abb);
+  color: #fff5e1;
+  border-bottom-color: #8477b34a;
+}
+.arena:not(.is-ready) .hud-label {
+  color: #b1aace;
+}
+.arena .game-tools button {
+  color: #efe7ff;
+  background: #211943cb;
+  border-color: #9585be;
+}
+.arena .chapter-chip {
+  background: #1e163ed9;
+  color: #e9e5ff;
+  border-color: #8c77ad;
+}
+.arena .chapter-chip span {
+  color: #ffe28b;
+}
+.skill-line {
+  background: #e4fafc;
+  border-color: #9adfe6;
+  border-bottom-color: #66cbd5;
+}
+.skill-rise {
+  background: #fff0e3;
+  border-color: #f3c7ab;
+  border-bottom-color: #eda776;
+}
+.skill-dive {
+  background: #f1eafd;
+  border-color: #d4bbef;
+  border-bottom-color: #b894e2;
+}
+.skill-wave {
+  background: #fbeafb;
+  border-color: #eabbea;
+  border-bottom-color: #d991d7;
+}
+@media (max-width: 480px) {
+  .header-logo {
+    width: 98px;
+    height: 54px;
+  }
+  .title-logo {
+    top: 6%;
+    left: 4%;
+    width: 82%;
+    max-height: 44%;
+  }
+  .title-launch {
+    left: 7%;
+    bottom: 22%;
+  }
+  .title-launch .title-kicker,
+  .title-launch p {
+    display: none;
+  }
+  .title-launch .primary {
+    font-size: 24px;
+    min-width: 150px;
+    padding: 7px 17px;
+    min-height: 38px;
+  }
+  .title-record {
+    margin-top: 10px;
+    padding: 3px 8px;
+  }
+  .title-record span {
+    font-size: 6px;
+  }
+  .title-record strong {
+    font-size: 13px;
+  }
+  .title-launch small {
+    font-size: 6px;
+  }
+}
 .is-ready .health,
 .is-ready .score,
 .is-ready .core-counter,
@@ -2022,6 +2223,24 @@ h1 > span:not(.title-star) {
 /* Touch landscape has its own game layout. Desktop and portrait keep the
    landing page and original cards. Safe-area variables are also testable. */
 @media (orientation: landscape) and (max-height: 540px) and (pointer: coarse) {
+  .immersive .title-logo {
+    width: 50%;
+    top: 3%;
+    left: max(26px, calc(var(--safe-left) + 8px));
+  }
+  .immersive .title-launch {
+    left: max(40px, calc(var(--safe-left) + 12px));
+    bottom: calc(var(--safe-bottom) + 30px);
+  }
+  .immersive .title-launch p {
+    display: none;
+  }
+  .immersive .title-launch .title-kicker {
+    display: none;
+  }
+  .immersive .title-art .object-legend {
+    bottom: calc(var(--safe-bottom) + 26px);
+  }
   .immersive .title-copy {
     top: max(32px, calc(var(--safe-top) + 20px));
     left: max(40px, calc(var(--safe-left) + 12px));
@@ -2200,14 +2419,14 @@ h1 > span:not(.title-star) {
     width: 72px;
     height: 72px;
     border-radius: 19px;
-    background: #fffdf0b8;
+    background: #1d173fe0;
     border: 1.5px solid color-mix(in srgb, var(--skill) 55%, transparent);
     box-shadow: 0 3px 0 color-mix(in srgb, var(--skill) 35%, transparent);
     transition:
       transform 0.08s,
       background 0.08s,
       box-shadow 0.08s;
-    color: #35494a;
+    color: #fff8ec;
   }
   .thumb-face svg {
     width: 42px;
@@ -2221,7 +2440,7 @@ h1 > span:not(.title-star) {
   .thumb-skill.active .thumb-face,
   .thumb-skill:active .thumb-face {
     transform: translateY(2px) scale(0.94);
-    background: color-mix(in srgb, var(--skill) 20%, #fffdf0dd);
+    background: color-mix(in srgb, var(--skill) 20%, #1d173fe0);
     box-shadow:
       0 0 0 2px var(--skill),
       0 0 20px color-mix(in srgb, var(--skill) 40%, transparent);

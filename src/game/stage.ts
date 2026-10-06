@@ -1,6 +1,7 @@
 import { FLOOR } from "./trajectory";
 import { makeObject, type SpawnSpec, type WorldObject } from "./objects";
-export const DURATION = 60;
+import { PALETTES, blendPalette, type Theme } from "./environment";
+export const DURATION = 150;
 export const SPEED = 142;
 export const LOWER_FLOOR = FLOOR + 100;
 export type Enemy = WorldObject;
@@ -21,10 +22,11 @@ const gate = (offset: number, link: string): SpawnSpec => ({
   offset,
   link,
 });
-const spike = (offset: number): SpawnSpec => ({
+const spike = (offset: number, leadSeconds = 1): SpawnSpec => ({
   role: "hazard",
   kind: "spike",
   offset,
+  leadSeconds,
 });
 const ceiling = (offset: number): SpawnSpec => ({
   role: "hazard",
@@ -50,7 +52,7 @@ export const PATTERNS = {
           enemy(300),
           core(360, 28, "dash"),
           gate(550, "dash"),
-          spike(830),
+          spike(830, 3),
         ],
       },
     ],
@@ -111,15 +113,67 @@ export const PATTERNS = {
   { name: string; events: { at: number; objects: SpawnSpec[] }[] }
 >;
 export type PatternId = keyof typeof PATTERNS;
+export const EXIT_AFTER: Record<PatternId, number> = {
+  DASH_GATE: 6,
+  UPPER_DIVE: 6.5,
+  CRASH_ROUTE: 7.3,
+  WAVE_ALLEY: 3.3,
+  MIXED_GATE: 5,
+};
+export const SECTIONS: {
+  start: number;
+  name: string;
+  theme: Theme;
+  pace: number;
+  tip: string;
+}[] = [
+  {
+    start: 0,
+    name: "ROOFTOP SIGNAL",
+    theme: "rooftops",
+    pace: 1,
+    tip: "위험물을 피하고 CORE로 길을 열어라.",
+  },
+  {
+    start: 36,
+    name: "CITY CIRCUIT",
+    theme: "city",
+    pace: 1.04,
+    tip: "도심의 신호를 연결하라.",
+  },
+  {
+    start: 72,
+    name: "FACTORY BREAK",
+    theme: "factory",
+    pace: 1.08,
+    tip: "충격판과 아래 루트를 돌파하라.",
+  },
+  {
+    start: 108,
+    name: "NEON RUSH",
+    theme: "night",
+    pace: 1.12,
+    tip: "밤의 봉쇄를 열고 끝까지 달려라.",
+  },
+];
 export const COURSE: { time: number; pattern: PatternId }[] = [
   { time: 1, pattern: "DASH_GATE" },
-  { time: 8, pattern: "UPPER_DIVE" },
-  { time: 16, pattern: "CRASH_ROUTE" },
-  { time: 24, pattern: "WAVE_ALLEY" },
-  { time: 32, pattern: "UPPER_DIVE" },
-  { time: 40, pattern: "CRASH_ROUTE" },
-  { time: 48, pattern: "MIXED_GATE" },
-  { time: 54, pattern: "WAVE_ALLEY" },
+  { time: 9, pattern: "UPPER_DIVE" },
+  { time: 17, pattern: "CRASH_ROUTE" },
+  { time: 27, pattern: "WAVE_ALLEY" },
+  { time: 37, pattern: "DASH_GATE" },
+  { time: 45, pattern: "WAVE_ALLEY" },
+  { time: 53, pattern: "UPPER_DIVE" },
+  { time: 61, pattern: "CRASH_ROUTE" },
+  { time: 73, pattern: "DASH_GATE" },
+  { time: 81, pattern: "UPPER_DIVE" },
+  { time: 89, pattern: "CRASH_ROUTE" },
+  { time: 99, pattern: "WAVE_ALLEY" },
+  { time: 109, pattern: "MIXED_GATE" },
+  { time: 119, pattern: "UPPER_DIVE" },
+  { time: 129, pattern: "CRASH_ROUTE" },
+  { time: 139, pattern: "WAVE_ALLEY" },
+  { time: 145, pattern: "MIXED_GATE" },
 ];
 export const ENCOUNTERS = COURSE.flatMap((chunk, index) =>
   PATTERNS[chunk.pattern].events.map((event) => ({
@@ -133,26 +187,40 @@ export const REQUIRED_CORES = ENCOUNTERS.reduce(
   (n, e) => n + e.layout.filter((o) => o.role === "core").length,
   0,
 );
-export const CHAPTERS = [
-  {
-    time: 0,
-    name: "SKYLINE BREACH",
-    tip: "위험물은 피하고, CORE로 문을 열어라.",
-  },
-  { time: 8, name: "AIR → IMPACT", tip: "공중 CORE를 깨고, 빠르게 아래로." },
-  {
-    time: 16,
-    name: "BREAK THE FLOOR",
-    tip: "공중 급강하로 금 간 바닥을 부숴라.",
-  },
-  { time: 24, name: "WAVE ALLEY", tip: "보너스 적을 하나의 물결로 연결." },
-  { time: 32, name: "SECOND LOCK", tip: "천장을 피하고 충격판을 내려찍어라." },
-  { time: 40, name: "LOWER ROUTE", tip: "아래 루트의 보너스를 노려라." },
-  { time: 48, name: "FINAL BREACH", tip: "마지막 CORE까지 연결하라." },
-  { time: 54, name: "HOME STRETCH", tip: "끝까지 흐름을 이어라." },
-];
+export const CHAPTERS = SECTIONS.map((s) => ({
+  time: s.start,
+  name: s.name,
+  tip: s.tip,
+}));
 export function chapterAt(time: number) {
   return [...CHAPTERS].reverse().find((c) => time >= c.time) ?? CHAPTERS[0];
+}
+export function sectionAt(time: number) {
+  return [...SECTIONS].reverse().find((s) => time >= s.start) ?? SECTIONS[0];
+}
+export function speedAt(time: number) {
+  const s = sectionAt(time),
+    i = SECTIONS.indexOf(s),
+    previous = SECTIONS[Math.max(0, i - 1)].pace;
+  const blend = Math.max(0, Math.min(1, (time - s.start) / 4));
+  return SPEED * (previous + (s.pace - previous) * blend);
+}
+export function sceneryAt(time: number) {
+  const s = sectionAt(time),
+    i = SECTIONS.indexOf(s),
+    prev = SECTIONS[Math.max(0, i - 1)];
+  return blendPalette(
+    PALETTES[prev.theme],
+    PALETTES[s.theme],
+    Math.max(0, Math.min(1, (time - s.start) / 3)),
+  );
+}
+export function pacedSpec(spec: SpawnSpec, time: number): SpawnSpec {
+  const lead = spec.leadSeconds ?? 1;
+  return {
+    ...spec,
+    offset: spec.offset + (speedAt(time + lead) - SPEED) * lead,
+  };
 }
 export function makeEnemy(
   id: number,

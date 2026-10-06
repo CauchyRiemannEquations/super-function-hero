@@ -22,6 +22,7 @@ import { SKILLS, type Skill } from "./game/trajectory";
 import Graph from "./components/SkillGraph";
 import MobileSkills from "./components/MobileSkills";
 import TitleScreen from "./components/TitleScreen";
+import { ART, loadArt } from "./game/assets";
 import {
   MOBILE_LANDSCAPE,
   enterGameFullscreen,
@@ -45,6 +46,7 @@ export default function App() {
     engine = useRef<Game | null>(null),
     arena = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<Snapshot>({ ...INITIAL });
+  const [artReady, setArtReady] = useState(false);
   const [muted, setMuted] = useState(false),
     [help, setHelp] = useState(false),
     [debug, setDebug] = useState(false);
@@ -72,9 +74,15 @@ export default function App() {
     const game = new Game(canvas.current!, setState);
     engine.current = game;
     game.setImmersive(matchMedia(MOBILE_LANDSCAPE).matches);
+    let active = true;
+    void loadArt().then(() => {
+      game.artReady = true;
+      if (active) setArtReady(true);
+    });
     if (import.meta.env.DEV)
       (window as unknown as { __curveGame?: Game }).__curveGame = game;
     return () => {
+      active = false;
       game.dispose();
       engine.current = null;
       if (import.meta.env.DEV)
@@ -134,19 +142,16 @@ export default function App() {
   };
   const playable = state.phase === "playing";
   const chapter = CHAPTERS[state.chapter];
+  const remaining = Math.ceil(Math.max(0, DURATION - state.time));
   return (
     <main className={`shell ${immersive ? "immersive" : ""}`}>
       <header className="header">
         <a className="brand" href="./" aria-label="Super Function Hero 홈">
-          <span className="brand-mark">
-            <Zap size={23} strokeWidth={2.5} />
-          </span>
-          <span>
-            <span className="brand-word">
-              SUPER FUNCTION <b>HERO</b>
-            </span>
-            <i />
-          </span>
+          <img
+            className="header-logo"
+            src={ART.logo}
+            alt="Super Function Hero"
+          />
         </a>
         <div className="header-right">
           <span className="prototype">
@@ -182,9 +187,9 @@ export default function App() {
             <Flag size={23} />
           </span>
           <div>
-            <span>RUN 01 / V0.2</span>
-            <strong>스카이라인 돌파</strong>
-            <small>60초 · CORE로 길을 여는 연속 코스</small>
+            <span>RUN 01 / V0.3</span>
+            <strong>스카이라인 투어</strong>
+            <small>150초 · 4개 환경을 잇는 연속 코스</small>
           </div>
           <ArrowUpRight size={20} />
         </div>
@@ -225,16 +230,16 @@ export default function App() {
               </strong>
             </div>
             <div className="stage-time">
-              <span className="hud-label">STAGE 01</span>
+              <span className="hud-label">
+                SECTION {String(state.chapter + 1).padStart(2, "0")}/04
+              </span>
               <div>
                 <span className="progress">
                   <i style={{ width: `${(state.time / DURATION) * 100}%` }} />
                 </span>
                 <strong>
-                  {String(
-                    Math.max(0, DURATION - Math.floor(state.time)),
-                  ).padStart(2, "0")}
-                  <small>s</small>
+                  {Math.floor(remaining / 60)}:
+                  {String(remaining % 60).padStart(2, "0")}
                 </strong>
               </div>
             </div>
@@ -284,7 +289,12 @@ export default function App() {
             </div>
           )}
           {state.phase === "ready" && !help && (
-            <TitleScreen start={start} help={openHelp} />
+            <TitleScreen
+              start={start}
+              help={openHelp}
+              ready={artReady}
+              best={best}
+            />
           )}
           {state.phase === "paused" && !help && (
             <div className="overlay">

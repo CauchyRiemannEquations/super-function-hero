@@ -1,0 +1,455 @@
+{
+  "checks": [
+    {
+      "name": "All five supplied sprites decode into render cache",
+      "passed": true,
+      "evidence": [
+        "bot",
+        "fracture",
+        "drone",
+        "spike",
+        "core"
+      ]
+    },
+    {
+      "name": "Logo and clean title art are real loaded images",
+      "passed": true
+    },
+    {
+      "name": "Enter starts loaded game",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 1 works",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 2 works",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 3 works",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 4 works",
+      "passed": true
+    },
+    {
+      "name": "Pause freezes time",
+      "passed": true
+    },
+    {
+      "name": "Esc resumes",
+      "passed": true
+    },
+    {
+      "name": "Actual 150s keyboard run finishes with HP3 and all 23 CORE/Gates",
+      "passed": true,
+      "evidence": {
+        "phase": "clear",
+        "hp": 3,
+        "score": 23288,
+        "combo": 64,
+        "maxCombo": 64,
+        "kills": 41,
+        "perfects": 41,
+        "time": 150.0000000000279,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 3,
+        "fps": 60.02194274653425,
+        "x": 28602.72059583288,
+        "y": 348,
+        "motion": "run",
+        "casts": 34,
+        "hits": 41,
+        "waveChains": 10,
+        "parabolaCombos": 8,
+        "lastEvent": "CORE BREAK",
+        "cores": 23,
+        "gates": 23,
+        "crashes": 4,
+        "route": "roof",
+        "floor": 348,
+        "failure": ""
+      }
+    },
+    {
+      "name": "Four sections keep playing without intermediate menus",
+      "passed": true,
+      "evidence": [
+        {
+          "chapter": 0,
+          "time": 2.316666666666661,
+          "phase": "playing",
+          "hp": 3,
+          "cores": 0
+        },
+        {
+          "chapter": 1,
+          "time": 38.3083333333318,
+          "phase": "playing",
+          "hp": 3,
+          "cores": 5
+        },
+        {
+          "chapter": 2,
+          "time": 74.3000000000052,
+          "phase": "playing",
+          "hp": 3,
+          "cores": 10
+        },
+        {
+          "chapter": 3,
+          "time": 110.00000000003361,
+          "phase": "playing",
+          "hp": 3,
+          "cores": 15
+        }
+      ]
+    },
+    {
+      "name": "Continuous combos and dive routes work",
+      "passed": true,
+      "evidence": {
+        "phase": "clear",
+        "hp": 3,
+        "score": 23288,
+        "combo": 64,
+        "maxCombo": 64,
+        "kills": 41,
+        "perfects": 41,
+        "time": 150.0000000000279,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 3,
+        "fps": 60.02194274653425,
+        "x": 28602.72059583288,
+        "y": 348,
+        "motion": "run",
+        "casts": 34,
+        "hits": 41,
+        "waveChains": 10,
+        "parabolaCombos": 8,
+        "lastEvent": "CORE BREAK",
+        "cores": 23,
+        "gates": 23,
+        "crashes": 4,
+        "route": "roof",
+        "floor": 348,
+        "failure": ""
+      }
+    },
+    {
+      "name": "Restart resets run, route, CORE and score",
+      "passed": true
+    },
+    {
+      "name": "Missing CORE still makes closed Gate failure",
+      "passed": true
+    },
+    {
+      "name": "844×390 title and play have identical frame and uniform canvas",
+      "passed": true,
+      "evidence": {
+        "title": {
+          "frame": [
+            0,
+            0,
+            844,
+            390
+          ],
+          "world": [
+            1416.934306569343,
+            654.7445255474453
+          ],
+          "bitmap": [
+            1688,
+            780
+          ],
+          "scroll": [
+            844,
+            390
+          ],
+          "buttons": [
+            {
+              "x": 16,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 96,
+              "bottom": 378,
+              "left": 16
+            },
+            {
+              "x": 106,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 186,
+              "bottom": 378,
+              "left": 106
+            },
+            {
+              "x": 658,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 738,
+              "bottom": 378,
+              "left": 658
+            },
+            {
+              "x": 748,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 828,
+              "bottom": 378,
+              "left": 748
+            }
+          ]
+        },
+        "play": {
+          "frame": [
+            0,
+            0,
+            844,
+            390
+          ],
+          "world": [
+            1416.934306569343,
+            654.7445255474453
+          ],
+          "bitmap": [
+            1688,
+            780
+          ],
+          "scroll": [
+            844,
+            390
+          ],
+          "buttons": [
+            {
+              "x": 16,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 96,
+              "bottom": 378,
+              "left": 16
+            },
+            {
+              "x": 106,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 186,
+              "bottom": 378,
+              "left": 106
+            },
+            {
+              "x": 658,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 738,
+              "bottom": 378,
+              "left": 658
+            },
+            {
+              "x": 748,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 828,
+              "bottom": 378,
+              "left": 748
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Four split thumb buttons fit",
+      "passed": true
+    },
+    {
+      "name": "Mobile touch line works",
+      "passed": true
+    },
+    {
+      "name": "Mobile touch rise works",
+      "passed": true
+    },
+    {
+      "name": "Mobile touch dive works",
+      "passed": true
+    },
+    {
+      "name": "Mobile touch wave works",
+      "passed": true
+    },
+    {
+      "name": "Factory touch aerial dive opens lower route",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 12908,
+        "combo": 37,
+        "maxCombo": 37,
+        "kills": 22,
+        "perfects": 22,
+        "time": 91.51666666668557,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 2,
+        "fps": 59.99921953811142,
+        "x": 17147.445798610144,
+        "y": 448,
+        "motion": "run",
+        "casts": 22,
+        "hits": 22,
+        "waveChains": 4,
+        "parabolaCombos": 6,
+        "lastEvent": "CRASH",
+        "cores": 15,
+        "gates": 15,
+        "crashes": 3,
+        "route": "lower",
+        "floor": 448,
+        "failure": ""
+      }
+    },
+    {
+      "name": "Factory touch wave hits four optional enemies with normal HP",
+      "passed": true,
+      "evidence": {
+        "before": {
+          "phase": "playing",
+          "hp": 3,
+          "score": 12908,
+          "combo": 37,
+          "maxCombo": 37,
+          "kills": 22,
+          "perfects": 22,
+          "time": 92.6083333333531,
+          "skill": null,
+          "bufferedSkill": null,
+          "chapter": 2,
+          "fps": 60.020212095999895,
+          "x": 17309.751798609945,
+          "y": 448,
+          "motion": "run",
+          "casts": 22,
+          "hits": 22,
+          "waveChains": 4,
+          "parabolaCombos": 6,
+          "lastEvent": "CRASH",
+          "cores": 15,
+          "gates": 15,
+          "crashes": 3,
+          "route": "lower",
+          "floor": 448,
+          "failure": ""
+        },
+        "after": {
+          "phase": "playing",
+          "hp": 3,
+          "score": 14588,
+          "combo": 41,
+          "maxCombo": 41,
+          "kills": 26,
+          "perfects": 26,
+          "time": 93.95833333335418,
+          "skill": null,
+          "bufferedSkill": null,
+          "chapter": 2,
+          "fps": 60.00082384088267,
+          "x": 17804.48179860989,
+          "y": 281.20000000000005,
+          "motion": "fall",
+          "casts": 23,
+          "hits": 26,
+          "waveChains": 5,
+          "parabolaCombos": 6,
+          "lastEvent": "PERFECT",
+          "cores": 15,
+          "gates": 15,
+          "crashes": 3,
+          "route": "lower",
+          "floor": 448,
+          "failure": ""
+        }
+      }
+    },
+    {
+      "name": "740×360 has four unclipped touch buttons",
+      "passed": true
+    },
+    {
+      "name": "Portrait title does not overflow",
+      "passed": true
+    },
+    {
+      "name": "Standalone includes every source PNG byte-for-byte",
+      "passed": true,
+      "evidence": {
+        "originals": 7,
+        "embedded": 7,
+        "bytes": 9379774
+      }
+    },
+    {
+      "name": "Single HTML loads embedded logo, accepts touch and hides DEV API",
+      "passed": true,
+      "evidence": []
+    },
+    {
+      "name": "No browser page/console errors",
+      "passed": true,
+      "evidence": []
+    }
+  ],
+  "errors": [],
+  "sections": [
+    {
+      "chapter": 0,
+      "time": 2.316666666666661,
+      "phase": "playing",
+      "hp": 3,
+      "cores": 0
+    },
+    {
+      "chapter": 1,
+      "time": 38.3083333333318,
+      "phase": "playing",
+      "hp": 3,
+      "cores": 5
+    },
+    {
+      "chapter": 2,
+      "time": 74.3000000000052,
+      "phase": "playing",
+      "hp": 3,
+      "cores": 10
+    },
+    {
+      "chapter": 3,
+      "time": 110.00000000003361,
+      "phase": "playing",
+      "hp": 3,
+      "cores": 15
+    }
+  ]
+}

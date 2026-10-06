@@ -1,4 +1,5 @@
 import type { WorldObject } from "./objects";
+import { drawSprite } from "./assets";
 
 export function drawObject(
   c: CanvasRenderingContext2D,
@@ -21,6 +22,39 @@ export function drawObject(
       return;
     }
     const pulse = 1 + Math.sin(tick * 5) * 0.06;
+    if (o.kind === "orb" && drawSprite(c, "core", -31, -34, 62)) {
+      c.strokeStyle = "#f8dc78";
+      c.lineWidth = 1.5;
+      c.beginPath();
+      c.arc(0, 0, 38 * pulse, tick, tick + 3);
+      c.stroke();
+      c.font = "800 10px Arial";
+      c.textAlign = "center";
+      c.fillStyle = "#ffdf7e";
+      c.fillText("CORE", 0, -44);
+      c.restore();
+      return;
+    }
+    if (
+      o.kind === "fracture" &&
+      drawSprite(c, "fracture", -o.width / 2, o.floor + 28 - o.y, o.width)
+    ) {
+      c.strokeStyle = "#ffe070";
+      c.lineWidth = 4;
+      for (let i = 0; i < 2; i++) {
+        c.beginPath();
+        c.moveTo(-10, -45 + i * 12);
+        c.lineTo(0, -36 + i * 12);
+        c.lineTo(10, -45 + i * 12);
+        c.stroke();
+      }
+      c.font = "800 10px Arial";
+      c.textAlign = "center";
+      c.fillStyle = "#ffe070";
+      c.fillText("CRASH CORE", 0, -57);
+      c.restore();
+      return;
+    }
     if (o.kind === "orb") {
       c.scale(pulse, pulse);
       c.fillStyle = "#fff7c6";
@@ -50,6 +84,7 @@ export function drawObject(
       c.fill();
       c.fillStyle = "#efbb3b";
       c.fillRect(-o.width / 2 + 4, -6, o.width - 8, 5);
+      if (o.kind === "impact") drawSprite(c, "core", -18, -34, 36);
       c.strokeStyle = "#e7b233";
       c.lineWidth = 4;
       for (let i = 0; i < 2; i++) {
@@ -117,6 +152,22 @@ export function drawObject(
     c.strokeStyle = "#f26452";
     c.lineWidth = 3;
     if (o.kind === "spike") {
+      if (
+        drawSprite(
+          c,
+          "spike",
+          -o.width / 2,
+          o.height / 2 - (o.width * 633) / 1199,
+          o.width,
+        )
+      ) {
+        c.font = "800 10px Arial";
+        c.textAlign = "center";
+        c.fillStyle = "#ff8771";
+        c.fillText("HAZARD", 0, -o.height / 2 - 12);
+        c.restore();
+        return;
+      }
       for (let i = -1; i < 2; i++) {
         c.beginPath();
         c.moveTo(i * 21 - 11, o.height / 2);

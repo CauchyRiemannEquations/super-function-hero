@@ -4,52 +4,67 @@ import {
   ShieldAlert,
   Bot,
   Target,
+  Trophy,
 } from "lucide-react";
-
+import { ART } from "../game/assets";
 export default function TitleScreen({
   start,
   help,
+  ready,
+  best,
 }: {
   start: () => void;
   help: () => void;
+  ready: boolean;
+  best: number;
 }) {
   return (
-    <div className="title-screen">
-      <div className="title-copy">
-        <span className="title-kicker">V0.2 / SKYLINE BREACH</span>
-        <h2>
-          <span>SUPER</span>
-          <span>FUNCTION</span>
-          <em>HERO</em>
-        </h2>
-        <p>곡선으로 돌파하라.</p>
+    <div
+      className="title-screen title-art"
+      style={{ backgroundImage: `url(${ART.titleBackground})` }}
+    >
+      <h2 className="sr-only">Super Function Hero</h2>
+      <img
+        className="title-logo"
+        src={ART.logo}
+        alt="Super Function Hero"
+        draggable={false}
+      />
+      <div className="title-launch">
+        <span className="title-kicker">V0.3 / CONTINUOUS RUN</span>
+        <p>RUN THE GRAPHS.</p>
         <div className="title-actions">
-          <button className="primary" onClick={start}>
-            플레이 시작 <ArrowUpRight size={20} />
+          <button className="primary" disabled={!ready} onClick={start}>
+            {ready ? "PLAY" : "준비 중…"} <ArrowUpRight size={22} />
           </button>
           <button
             className="title-help"
             onClick={help}
             aria-label="게임 가이드"
           >
-            <CircleHelp size={21} />
+            <CircleHelp size={22} />
           </button>
         </div>
-        <small>60초 · 네 개의 함수 · 하나의 연속 코스</small>
+        <div className="title-record">
+          <Trophy size={14} />
+          <span>LOCAL BEST</span>
+          <strong>{best.toLocaleString()}</strong>
+        </div>
+        <small>2분 30초 · 옥상 → 도심 → 공장 → 네온 러시</small>
       </div>
       <div className="object-legend" aria-label="오브젝트 역할">
         <div className="legend-hazard">
-          <ShieldAlert size={23} />
+          <ShieldAlert size={21} />
           <strong>HAZARD</strong>
           <span>피한다</span>
         </div>
         <div className="legend-enemy">
-          <Bot size={23} />
+          <Bot size={21} />
           <strong>ENEMY</strong>
           <span>보너스</span>
         </div>
         <div className="legend-core">
-          <Target size={23} />
+          <Target size={21} />
           <strong>CORE</strong>
           <span>문을 연다</span>
         </div>
