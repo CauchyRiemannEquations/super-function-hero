@@ -28,7 +28,9 @@ npm run dev
 | R | | 즉시 처음부터 재시작 |
 | Space / Esc | | 일시정지 / 계속 |
 
-모바일은 `pointerdown`에서 바로 발동합니다. 공중에서도 다른 기술로 연결할 수 있습니다. 0.12초의 중복 입력 제한만 있으며 별도 스킬 쿨다운은 없습니다.
+모바일은 `pointerdown`에서 바로 발동합니다. 공중에서도 다른 기술로 연결할 수 있습니다. 0.12초 중복 입력 제한에 걸린 입력과 기술 종료 직전 입력을 마지막 하나만 0.14초 기억하는 버퍼를 적용했습니다. 별도 스킬 쿨다운은 없습니다.
+
+모바일 가로 터치 화면(높이 540px 이하)은 시작 후 몰입 모드로 전환합니다. 왼쪽 아래에 `x / sin x`, 오른쪽 아래에 `x² / −x²`를 배치하고 원래 카드 패널을 숨깁니다. 세로 모드와 데스크톱의 기존 디자인은 유지합니다. 자세한 배치는 [NEXT_STEPS.md](NEXT_STEPS.md)에 있습니다.
 
 ## 게임 규칙
 
@@ -48,12 +50,19 @@ npm run dev
 src/
   App.tsx              HUD, 스킬 입력, 가이드, 결과, 개발 도구
   style.css            반응형 UI와 간단한 피드백 애니메이션
+  components/
+    MobileSkills.tsx    좌우 2+2 인게임 버튼
+    SkillGraph.tsx      공용 그래프 아이콘
   game/
     engine.ts          120Hz 고정 스텝, 상태, 충돌, 카메라, Canvas 렌더링
     trajectory.ts      정규화 궤적과 이동 구간 충돌 거리 계산
     trajectory.test.ts 궤적·시작점·충돌 회귀 테스트
     stage.ts           38초의 구간과 적·장애물 배치
     audio.ts           Web Audio 기반 짧은 효과음
+    input.ts           140ms 단일 입력 버퍼
+    input.test.ts      입력의 교체·만료와 시야 보호 회귀 테스트
+    viewport.ts        균일 배율과 하단 손가락 영역 보호
+    browser-mode.ts    optional fullscreen / orientation lock
 ```
 
 React는 UI를 담당하고 게임 좌표는 엔진에서 관리합니다. `requestAnimationFrame`으로 그리며 1/120초 단위로 시뮬레이션합니다. 이동 구간을 검사하는 충돌 판정이 빠른 대시의 적 관통을 방지합니다. 탭이 숨겨지면 자동 일시정지합니다.
@@ -61,6 +70,10 @@ React는 UI를 담당하고 게임 좌표는 엔진에서 관리합니다. `requ
 게임의 y축은 아래로 증가합니다. 상승은 `−t²`, 낙하는 `+t²`를 사용합니다. 웨이브는 평행 이동·위상 이동한 사인 곡선 `(1 − cos(3πt))`으로 옥상 아래를 지나가지 않도록 배치했습니다. 기술 종료 이후에는 중력으로 자연스럽게 착지합니다. 이동 궤적을 실제 좌표로 기록하고 약 0.85초 동안 감쇠합니다.
 
 각 적 그룹은 해당 구간 시점의 플레이어 위치를 기준으로 생성합니다. 따라서 기술의 전진 거리 때문에 다음 구간이 미리 소모되지 않습니다. 미니맵 대신 적의 링과 화면 가장자리의 위치 화살표로 앞의 상황을 예고합니다.
+
+Canvas의 물리 좌표계 높이 460은 유지합니다. 가로 몰입 모드에서는 실제 버튼 상단과 24px 여백을 읽어 전투 시야를 보호하고, 가로·세로를 같은 배율로 그립니다. 남는 하단에는 기존 옥상 바닥을 연장합니다. ResizeObserver와 몰입 모드 전환에서 DPR 비트맵·배율·카메라 기준을 다시 계산하므로 회전이 충돌이나 기술 좌표를 바꾸지 않습니다.
+
+Fullscreen과 Screen Orientation은 사용자 시작/도구 버튼에서 지원 여부를 확인한 뒤 시도하고 모든 거절을 처리합니다. 네이티브 API 없이도 CSS 몰입 모드에서 정상 진행합니다. 브라우저별 지원 차이는 [MDN fullscreen 문서](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen), [orientation lock 문서](https://developer.mozilla.org/en-US/docs/Web/API/ScreenOrientation/lock)를 참고했습니다.
 
 ## 개발·검증
 
@@ -73,7 +86,11 @@ npm run standalone
 
 개발 서버의 왼쪽 아래 **DEV +**에서 FPS, 좌표, 함수, hitbox, 이동 속도, 무적, 적·장애물 생성, 각 기술 테스트를 제공합니다. 기술 테스트는 시작 후 사용할 수 있습니다. 개발 모드에서만 `window.__curveGame`을 노출하며 빌드에서 제거됩니다.
 
-검증 결과: 궤적·충돌 회귀 테스트 4개 및 브라우저 시나리오 21개 통과. 무적 없이 실제 키 입력으로 HP 3칸을 유지하며 클리어했고, 타격 18회 / 최대 콤보 17 / PERFECT 12 / 4,936점을 기록했습니다. 웨이브 다중 타격, 포물선 연계, 충돌에 의한 HP 0과 재시작, 390px 터치 및 320px 레이아웃을 확인했습니다. 최종 콘솔 경고·오류는 없었습니다.
+초기 MVP의 검증 결과는 `docs/verification.json`에 보존되어 있습니다. 모바일 가로 UI 변경 후에는 단위 테스트 8개와 브라우저 검증 54개 항목이 통과했습니다. 무적 없이 실제 38초 키 입력으로 HP 3칸 / 타격 21 / 최대 콤보 21 / PERFECT 15 / 6,398점 클리어를 확인했습니다. 마지막 러시의 서로 다른 두 경로도 실제 터치로 검증했습니다. 전반부는 고정 스텝으로 재현한 뒤 마지막 8초를 실제 시간으로 진행했습니다.
+
+390×844 세로, 844×390·740×360 가로, 44px 좌우·21px 하단 safe-area 시뮬레이션, 회전, 입력 버퍼, 클리어·실패·재시작·나가기를 확인했습니다. 터치 에뮬레이션은 119프레임 중앙값 16.7ms / 95백분위 16.8ms였습니다. 최종 콘솔 오류·경고는 없었습니다. 상세 항목은 `docs/verification-mobile.json`에 있습니다.
+
+테스트 브라우저에서 네이티브 fullscreen은 `not granted`였습니다. fullscreen lifecycle의 UI는 이벤트 시뮬레이션으로, fullscreen/orientation lock 거절은 별도 사례로 검증했습니다. 실제 장치의 네이티브 API와 성능을 검증했다고 해석하지 마세요.
 
 단일 HTML은 `file://`로 직접 열어 시작, 키보드 기술, 일시정지, 재시작, 실제 적 타격을 추가로 확인했습니다. 개발 UI와 개발 엔진 노출도 배포본에서 제거되었습니다. 상세 요약은 `docs/verification.json`, 실제 플레이 캡처는 `docs/images/desktop-action.png`, `docs/images/desktop-clear.png`, `docs/images/mobile-ready.png`에 있습니다.
 

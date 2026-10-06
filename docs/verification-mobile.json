@@ -1,0 +1,1551 @@
+{
+  "checks": [
+    {
+      "name": "Desktop landing preserved",
+      "passed": true
+    },
+    {
+      "name": "Enter starts stage",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 1 skill works",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0,
+        "skill": "line",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 60,
+        "x": 180,
+        "y": 348,
+        "motion": "skill",
+        "casts": 1,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "LINE DASH"
+      }
+    },
+    {
+      "name": "Keyboard 2 skill works",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0,
+        "skill": "rise",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 60,
+        "x": 180,
+        "y": 348,
+        "motion": "skill",
+        "casts": 1,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "SKY UPPERCUT"
+      }
+    },
+    {
+      "name": "Keyboard 3 skill works",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0,
+        "skill": "dive",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 60,
+        "x": 180,
+        "y": 348,
+        "motion": "hop",
+        "casts": 1,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "POWER DIVE"
+      }
+    },
+    {
+      "name": "Keyboard 4 skill works",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.14166666666666666,
+        "skill": "wave",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 55.88869044954866,
+        "x": 240.71428571428572,
+        "y": 285.93845534815955,
+        "motion": "skill",
+        "casts": 1,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "WAVE FLOW"
+      }
+    },
+    {
+      "name": "Space pauses time",
+      "passed": true
+    },
+    {
+      "name": "Esc resumes",
+      "passed": true
+    },
+    {
+      "name": "Quick uppercut→dive guard input is buffered and fires",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.3000000000000001,
+        "skill": "dive",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 50.77668308821904,
+        "x": 262.2823529411765,
+        "y": 187.6237374502298,
+        "motion": "hop",
+        "casts": 2,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "POWER DIVE"
+      }
+    },
+    {
+      "name": "End-window input keeps uppercut active until completion",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.5666666666666671,
+        "skill": "rise",
+        "bufferedSkill": "dive",
+        "chapter": 0,
+        "fps": 44.9860815633846,
+        "x": 400.2166666666669,
+        "y": 175.21836419753052,
+        "motion": "skill",
+        "casts": 1,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "SKY UPPERCUT"
+      }
+    },
+    {
+      "name": "End-window dive starts airborne after uppercut",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.7249999999999999,
+        "skill": "dive",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 42.224672704055095,
+        "x": 467.55,
+        "y": 144.48,
+        "motion": "skill",
+        "casts": 2,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "POWER DIVE"
+      }
+    },
+    {
+      "name": "Pause discards buffered input",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.3000000000000001,
+        "skill": "rise",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 46.260577646473294,
+        "x": 300.00000000000006,
+        "y": 294.99999999999994,
+        "motion": "skill",
+        "casts": 1,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "SKY UPPERCUT"
+      }
+    },
+    {
+      "name": "Desktop fullscreen lifecycle keeps cards and canvas (native or simulated)",
+      "passed": true,
+      "evidence": {
+        "entered": false,
+        "failure": "not granted"
+      }
+    },
+    {
+      "name": "Desktop fullscreen exits",
+      "passed": true
+    },
+    {
+      "name": "Desktop real 38s keyboard play clears normally",
+      "passed": true,
+      "evidence": {
+        "phase": "clear",
+        "hp": 3,
+        "score": 6398,
+        "combo": 21,
+        "maxCombo": 21,
+        "kills": 21,
+        "perfects": 15,
+        "time": 38.00833333333182,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 6,
+        "fps": 30.000822867973017,
+        "x": 8007.483333333512,
+        "y": 348,
+        "motion": "run",
+        "casts": 12,
+        "hits": 21,
+        "waveChains": 2,
+        "parabolaCombos": 2,
+        "lastEvent": "PERFECT"
+      }
+    },
+    {
+      "name": "Combo, Perfect, Wave and Parabola preserved",
+      "passed": true,
+      "evidence": {
+        "phase": "clear",
+        "hp": 3,
+        "score": 6398,
+        "combo": 21,
+        "maxCombo": 21,
+        "kills": 21,
+        "perfects": 15,
+        "time": 38.00833333333182,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 6,
+        "fps": 30.000822867973017,
+        "x": 8007.483333333512,
+        "y": 348,
+        "motion": "run",
+        "casts": 12,
+        "hits": 21,
+        "waveChains": 2,
+        "parabolaCombos": 2,
+        "lastEvent": "PERFECT"
+      }
+    },
+    {
+      "name": "Clear restart resets score and HP",
+      "passed": true
+    },
+    {
+      "name": "No-input collisions produce Game Over",
+      "passed": true,
+      "evidence": {
+        "phase": "over",
+        "hp": 0,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 24.69999999999924,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 5,
+        "fps": 30.000981351072838,
+        "x": 3687.4000000001142,
+        "y": 348,
+        "motion": "run",
+        "casts": 0,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "DAMAGE"
+      }
+    },
+    {
+      "name": "R restarts after failure",
+      "passed": true
+    },
+    {
+      "name": "390×844 portrait retains landing and original cards",
+      "passed": true
+    },
+    {
+      "name": "Rotation keeps live stage progress",
+      "passed": true
+    },
+    {
+      "name": "844×390 fills screen without page scroll",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          844,
+          390
+        ],
+        "scroll": [
+          844,
+          390
+        ],
+        "canvas": {
+          "w": 844,
+          "h": 390,
+          "pw": 1688,
+          "ph": 780,
+          "scaleX": 0.5956521739130435,
+          "scaleY": 0.5956521739130435
+        },
+        "reserve": 116,
+        "groundBottom": 231.11304347826086,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 16,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 96,
+            "bottom": 378,
+            "left": 16
+          },
+          {
+            "key": "4",
+            "x": 106,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 186,
+            "bottom": 378,
+            "left": 106
+          },
+          {
+            "key": "2",
+            "x": 658,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 738,
+            "bottom": 378,
+            "left": 658
+          },
+          {
+            "key": "3",
+            "x": 748,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 828,
+            "bottom": 378,
+            "left": 748
+          }
+        ]
+      }
+    },
+    {
+      "name": "844×390 four thumb targets fit and are >=64px",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          844,
+          390
+        ],
+        "scroll": [
+          844,
+          390
+        ],
+        "canvas": {
+          "w": 844,
+          "h": 390,
+          "pw": 1688,
+          "ph": 780,
+          "scaleX": 0.5956521739130435,
+          "scaleY": 0.5956521739130435
+        },
+        "reserve": 116,
+        "groundBottom": 231.11304347826086,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 16,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 96,
+            "bottom": 378,
+            "left": 16
+          },
+          {
+            "key": "4",
+            "x": 106,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 186,
+            "bottom": 378,
+            "left": 106
+          },
+          {
+            "key": "2",
+            "x": 658,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 738,
+            "bottom": 378,
+            "left": 658
+          },
+          {
+            "key": "3",
+            "x": 748,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 828,
+            "bottom": 378,
+            "left": 748
+          }
+        ]
+      }
+    },
+    {
+      "name": "844×390 equal canvas scales and DPR bitmap",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          844,
+          390
+        ],
+        "scroll": [
+          844,
+          390
+        ],
+        "canvas": {
+          "w": 844,
+          "h": 390,
+          "pw": 1688,
+          "ph": 780,
+          "scaleX": 0.5956521739130435,
+          "scaleY": 0.5956521739130435
+        },
+        "reserve": 116,
+        "groundBottom": 231.11304347826086,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 16,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 96,
+            "bottom": 378,
+            "left": 16
+          },
+          {
+            "key": "4",
+            "x": 106,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 186,
+            "bottom": 378,
+            "left": 106
+          },
+          {
+            "key": "2",
+            "x": 658,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 738,
+            "bottom": 378,
+            "left": 658
+          },
+          {
+            "key": "3",
+            "x": 748,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 828,
+            "bottom": 378,
+            "left": 748
+          }
+        ]
+      }
+    },
+    {
+      "name": "844×390 ground enemies clear controls",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          844,
+          390
+        ],
+        "scroll": [
+          844,
+          390
+        ],
+        "canvas": {
+          "w": 844,
+          "h": 390,
+          "pw": 1688,
+          "ph": 780,
+          "scaleX": 0.5956521739130435,
+          "scaleY": 0.5956521739130435
+        },
+        "reserve": 116,
+        "groundBottom": 231.11304347826086,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 16,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 96,
+            "bottom": 378,
+            "left": 16
+          },
+          {
+            "key": "4",
+            "x": 106,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 186,
+            "bottom": 378,
+            "left": 106
+          },
+          {
+            "key": "2",
+            "x": 658,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 738,
+            "bottom": 378,
+            "left": 658
+          },
+          {
+            "key": "3",
+            "x": 748,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 828,
+            "bottom": 378,
+            "left": 748
+          }
+        ]
+      }
+    },
+    {
+      "name": "Left=line,wave and right=rise,dive",
+      "passed": true,
+      "evidence": [
+        {
+          "key": "1",
+          "x": 16,
+          "y": 298,
+          "width": 80,
+          "height": 80,
+          "top": 298,
+          "right": 96,
+          "bottom": 378,
+          "left": 16
+        },
+        {
+          "key": "4",
+          "x": 106,
+          "y": 298,
+          "width": 80,
+          "height": 80,
+          "top": 298,
+          "right": 186,
+          "bottom": 378,
+          "left": 106
+        },
+        {
+          "key": "2",
+          "x": 658,
+          "y": 298,
+          "width": 80,
+          "height": 80,
+          "top": 298,
+          "right": 738,
+          "bottom": 378,
+          "left": 658
+        },
+        {
+          "key": "3",
+          "x": 748,
+          "y": 298,
+          "width": 80,
+          "height": 80,
+          "top": 298,
+          "right": 828,
+          "bottom": 378,
+          "left": 748
+        }
+      ]
+    },
+    {
+      "name": "Landscape touch line fires",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.4000000000000004,
+        "skill": "line",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 59.22165515511845,
+        "x": 355.33333333333337,
+        "y": 322.3333333333333,
+        "motion": "skill",
+        "casts": 1,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "LINE DASH"
+      }
+    },
+    {
+      "name": "Landscape touch wave fires",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.30833333333333346,
+        "skill": "wave",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 60.00412653498787,
+        "x": 281.0976190476191,
+        "y": 240.41815781184434,
+        "motion": "skill",
+        "casts": 1,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "WAVE FLOW"
+      }
+    },
+    {
+      "name": "Landscape touch rise fires",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.33333333333333354,
+        "skill": "rise",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 59.99269403927933,
+        "x": 287.53333333333336,
+        "y": 315.9382716049383,
+        "motion": "skill",
+        "casts": 1,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "SKY UPPERCUT"
+      }
+    },
+    {
+      "name": "Landscape touch dive fires",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.275,
+        "skill": "dive",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 60.00447790735749,
+        "x": 229.20000000000005,
+        "y": 193,
+        "motion": "skill",
+        "casts": 1,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "POWER DIVE"
+      }
+    },
+    {
+      "name": "Right-thumb quick rise→dive buffered",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 0.4666666666666673,
+        "skill": "dive",
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 59.97839640601899,
+        "x": 306.53333333333336,
+        "y": 175.15753858024692,
+        "motion": "skill",
+        "casts": 2,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "POWER DIVE"
+      }
+    },
+    {
+      "name": "740×360 fills screen without page scroll",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          740,
+          360
+        ],
+        "scroll": [
+          740,
+          360
+        ],
+        "canvas": {
+          "w": 740,
+          "h": 360,
+          "pw": 1480,
+          "ph": 720,
+          "scaleX": 0.5304347826086957,
+          "scaleY": 0.5304347826086957
+        },
+        "reserve": 116,
+        "groundBottom": 205.80869565217392,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 16,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 96,
+            "bottom": 348,
+            "left": 16
+          },
+          {
+            "key": "4",
+            "x": 106,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 186,
+            "bottom": 348,
+            "left": 106
+          },
+          {
+            "key": "2",
+            "x": 554,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 634,
+            "bottom": 348,
+            "left": 554
+          },
+          {
+            "key": "3",
+            "x": 644,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 724,
+            "bottom": 348,
+            "left": 644
+          }
+        ]
+      }
+    },
+    {
+      "name": "740×360 four thumb targets fit and are >=64px",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          740,
+          360
+        ],
+        "scroll": [
+          740,
+          360
+        ],
+        "canvas": {
+          "w": 740,
+          "h": 360,
+          "pw": 1480,
+          "ph": 720,
+          "scaleX": 0.5304347826086957,
+          "scaleY": 0.5304347826086957
+        },
+        "reserve": 116,
+        "groundBottom": 205.80869565217392,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 16,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 96,
+            "bottom": 348,
+            "left": 16
+          },
+          {
+            "key": "4",
+            "x": 106,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 186,
+            "bottom": 348,
+            "left": 106
+          },
+          {
+            "key": "2",
+            "x": 554,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 634,
+            "bottom": 348,
+            "left": 554
+          },
+          {
+            "key": "3",
+            "x": 644,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 724,
+            "bottom": 348,
+            "left": 644
+          }
+        ]
+      }
+    },
+    {
+      "name": "740×360 equal canvas scales and DPR bitmap",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          740,
+          360
+        ],
+        "scroll": [
+          740,
+          360
+        ],
+        "canvas": {
+          "w": 740,
+          "h": 360,
+          "pw": 1480,
+          "ph": 720,
+          "scaleX": 0.5304347826086957,
+          "scaleY": 0.5304347826086957
+        },
+        "reserve": 116,
+        "groundBottom": 205.80869565217392,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 16,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 96,
+            "bottom": 348,
+            "left": 16
+          },
+          {
+            "key": "4",
+            "x": 106,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 186,
+            "bottom": 348,
+            "left": 106
+          },
+          {
+            "key": "2",
+            "x": 554,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 634,
+            "bottom": 348,
+            "left": 554
+          },
+          {
+            "key": "3",
+            "x": 644,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 724,
+            "bottom": 348,
+            "left": 644
+          }
+        ]
+      }
+    },
+    {
+      "name": "740×360 ground enemies clear controls",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          740,
+          360
+        ],
+        "scroll": [
+          740,
+          360
+        ],
+        "canvas": {
+          "w": 740,
+          "h": 360,
+          "pw": 1480,
+          "ph": 720,
+          "scaleX": 0.5304347826086957,
+          "scaleY": 0.5304347826086957
+        },
+        "reserve": 116,
+        "groundBottom": 205.80869565217392,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 16,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 96,
+            "bottom": 348,
+            "left": 16
+          },
+          {
+            "key": "4",
+            "x": 106,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 186,
+            "bottom": 348,
+            "left": 106
+          },
+          {
+            "key": "2",
+            "x": 554,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 634,
+            "bottom": 348,
+            "left": 554
+          },
+          {
+            "key": "3",
+            "x": 644,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 724,
+            "bottom": 348,
+            "left": 644
+          }
+        ]
+      }
+    },
+    {
+      "name": "740×360 simulated notch fills screen without page scroll",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          740,
+          360
+        ],
+        "scroll": [
+          740,
+          360
+        ],
+        "canvas": {
+          "w": 740,
+          "h": 360,
+          "pw": 1480,
+          "ph": 720,
+          "scaleX": 0.48478260869565215,
+          "scaleY": 0.48478260869565215
+        },
+        "reserve": 137,
+        "groundBottom": 188.09565217391304,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 52,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 132,
+            "bottom": 327,
+            "left": 52
+          },
+          {
+            "key": "4",
+            "x": 142,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 222,
+            "bottom": 327,
+            "left": 142
+          },
+          {
+            "key": "2",
+            "x": 518,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 598,
+            "bottom": 327,
+            "left": 518
+          },
+          {
+            "key": "3",
+            "x": 608,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 688,
+            "bottom": 327,
+            "left": 608
+          }
+        ]
+      }
+    },
+    {
+      "name": "740×360 simulated notch four thumb targets fit and are >=64px",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          740,
+          360
+        ],
+        "scroll": [
+          740,
+          360
+        ],
+        "canvas": {
+          "w": 740,
+          "h": 360,
+          "pw": 1480,
+          "ph": 720,
+          "scaleX": 0.48478260869565215,
+          "scaleY": 0.48478260869565215
+        },
+        "reserve": 137,
+        "groundBottom": 188.09565217391304,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 52,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 132,
+            "bottom": 327,
+            "left": 52
+          },
+          {
+            "key": "4",
+            "x": 142,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 222,
+            "bottom": 327,
+            "left": 142
+          },
+          {
+            "key": "2",
+            "x": 518,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 598,
+            "bottom": 327,
+            "left": 518
+          },
+          {
+            "key": "3",
+            "x": 608,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 688,
+            "bottom": 327,
+            "left": 608
+          }
+        ]
+      }
+    },
+    {
+      "name": "740×360 simulated notch equal canvas scales and DPR bitmap",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          740,
+          360
+        ],
+        "scroll": [
+          740,
+          360
+        ],
+        "canvas": {
+          "w": 740,
+          "h": 360,
+          "pw": 1480,
+          "ph": 720,
+          "scaleX": 0.48478260869565215,
+          "scaleY": 0.48478260869565215
+        },
+        "reserve": 137,
+        "groundBottom": 188.09565217391304,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 52,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 132,
+            "bottom": 327,
+            "left": 52
+          },
+          {
+            "key": "4",
+            "x": 142,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 222,
+            "bottom": 327,
+            "left": 142
+          },
+          {
+            "key": "2",
+            "x": 518,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 598,
+            "bottom": 327,
+            "left": 518
+          },
+          {
+            "key": "3",
+            "x": 608,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 688,
+            "bottom": 327,
+            "left": 608
+          }
+        ]
+      }
+    },
+    {
+      "name": "740×360 simulated notch ground enemies clear controls",
+      "passed": true,
+      "evidence": {
+        "viewport": [
+          740,
+          360
+        ],
+        "scroll": [
+          740,
+          360
+        ],
+        "canvas": {
+          "w": 740,
+          "h": 360,
+          "pw": 1480,
+          "ph": 720,
+          "scaleX": 0.48478260869565215,
+          "scaleY": 0.48478260869565215
+        },
+        "reserve": 137,
+        "groundBottom": 188.09565217391304,
+        "buttons": [
+          {
+            "key": "1",
+            "x": 52,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 132,
+            "bottom": 327,
+            "left": 52
+          },
+          {
+            "key": "4",
+            "x": 142,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 222,
+            "bottom": 327,
+            "left": 142
+          },
+          {
+            "key": "2",
+            "x": 518,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 598,
+            "bottom": 327,
+            "left": 518
+          },
+          {
+            "key": "3",
+            "x": 608,
+            "y": 247,
+            "width": 80,
+            "height": 80,
+            "top": 247,
+            "right": 688,
+            "bottom": 327,
+            "left": 608
+          }
+        ]
+      }
+    },
+    {
+      "name": "Safe-area controls clear 44px notch and 21px home inset",
+      "passed": true,
+      "evidence": [
+        {
+          "key": "1",
+          "x": 52,
+          "y": 247,
+          "width": 80,
+          "height": 80,
+          "top": 247,
+          "right": 132,
+          "bottom": 327,
+          "left": 52
+        },
+        {
+          "key": "4",
+          "x": 142,
+          "y": 247,
+          "width": 80,
+          "height": 80,
+          "top": 247,
+          "right": 222,
+          "bottom": 327,
+          "left": 142
+        },
+        {
+          "key": "2",
+          "x": 518,
+          "y": 247,
+          "width": 80,
+          "height": 80,
+          "top": 247,
+          "right": 598,
+          "bottom": 327,
+          "left": 518
+        },
+        {
+          "key": "3",
+          "x": 608,
+          "y": 247,
+          "width": 80,
+          "height": 80,
+          "top": 247,
+          "right": 688,
+          "bottom": 327,
+          "left": 608
+        }
+      ]
+    },
+    {
+      "name": "Finale test prefix arrives with normal HP",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 3716,
+        "combo": 14,
+        "maxCombo": 14,
+        "kills": 14,
+        "perfects": 10,
+        "time": 29.933333333332275,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 6,
+        "fps": 60.00503975182163,
+        "x": 6054.116666666805,
+        "y": 297.62499999999994,
+        "motion": "fall",
+        "casts": 8,
+        "hits": 14,
+        "waveChains": 1,
+        "parabolaCombos": 1,
+        "lastEvent": "PERFECT"
+      }
+    },
+    {
+      "name": "Finale A: dash→wave→uppercut→dive clears",
+      "passed": true,
+      "evidence": {
+        "phase": "clear",
+        "hp": 3,
+        "score": 6236,
+        "combo": 21,
+        "maxCombo": 21,
+        "kills": 21,
+        "perfects": 14,
+        "time": 38.00833333333182,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 6,
+        "fps": 60.00293232318198,
+        "x": 8007.483333333512,
+        "y": 348,
+        "motion": "run",
+        "casts": 12,
+        "hits": 21,
+        "waveChains": 2,
+        "parabolaCombos": 2,
+        "lastEvent": "HIT"
+      }
+    },
+    {
+      "name": "Finale B: wave-first route also clears",
+      "passed": true,
+      "evidence": {
+        "phase": "clear",
+        "hp": 3,
+        "score": 6376,
+        "combo": 21,
+        "maxCombo": 21,
+        "kills": 21,
+        "perfects": 15,
+        "time": 38.00833333333182,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 6,
+        "fps": 60.01875207947208,
+        "x": 7804.283333333515,
+        "y": 348,
+        "motion": "run",
+        "casts": 11,
+        "hits": 21,
+        "waveChains": 2,
+        "parabolaCombos": 2,
+        "lastEvent": "HIT"
+      }
+    },
+    {
+      "name": "Rejected fullscreen does not prevent playing",
+      "passed": true
+    },
+    {
+      "name": "Pause modal can exit to title",
+      "passed": true
+    },
+    {
+      "name": "Result exit restores landing, scroll mode and clears input",
+      "passed": true
+    },
+    {
+      "name": "Playing HUD exit works",
+      "passed": true
+    },
+    {
+      "name": "Rotation back to portrait restores cards and live progress",
+      "passed": true
+    },
+    {
+      "name": "Repeated rotation recomputes canvas and preserves isotropy",
+      "passed": true
+    },
+    {
+      "name": "Emulated mobile render loop remains responsive",
+      "passed": true,
+      "evidence": {
+        "frames": 119,
+        "medianMs": 16.699999999999818,
+        "p95Ms": 16.800000000000182,
+        "engineFps": 60.003391847625316
+      }
+    },
+    {
+      "name": "Refused orientation lock after simulated fullscreen keeps game playing",
+      "passed": true
+    },
+    {
+      "name": "Mobile simulated fullscreen exit retains immersive game and correct canvas",
+      "passed": true
+    },
+    {
+      "name": "Latest standalone HTML runs mobile HUD and hides DEV API",
+      "passed": true
+    },
+    {
+      "name": "No browser errors or warnings",
+      "passed": true,
+      "evidence": {
+        "errors": [],
+        "warnings": []
+      }
+    }
+  ],
+  "errors": [],
+  "warnings": [],
+  "performance": [
+    {
+      "mode": "Chromium touch emulation, 844×390, DPR 2",
+      "frames": 119,
+      "medianMs": 16.699999999999818,
+      "p95Ms": 16.800000000000182,
+      "engineFps": 60.003391847625316
+    }
+  ],
+  "nativeFullscreen": {
+    "entered": false,
+    "failure": "not granted"
+  }
+}

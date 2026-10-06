@@ -104,13 +104,24 @@ export const ENCOUNTERS = [
     ],
   },
   {
-    time: 30.7,
+    // An opening low target supports dash → wave or dash → uppercut.
+    // The mixed cluster can also be crossed by one wave, without a skill gate.
+    time: 30,
     layout: [
-      [300, 224, "drone"],
-      [450, 302, "bot"],
-      [565, 184, "drone"],
-      [780, FLOOR - 20, "bot"],
-      [850, FLOOR - 20, "bot"],
+      [285, FLOOR - 18, "bot"],
+      [430, 220, "drone"],
+      [575, 302, "bot"],
+      [680, 184, "drone"],
+    ],
+  },
+  {
+    // A second short beat at 34s keeps action near the finish. High + low
+    // pairs allow uppercut → dive, or a timed wave followed by a dash.
+    time: 34,
+    layout: [
+      [315, 176, "drone"],
+      [600, FLOOR - 22, "bot"],
+      [665, FLOOR - 22, "bot"],
     ],
   },
 ] as const;

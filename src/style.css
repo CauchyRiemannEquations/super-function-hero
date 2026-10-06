@@ -976,8 +976,11 @@ h1 > span:not(.title-star) {
   border-radius: 3px;
 }
 .fullscreen {
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  width: 100dvw;
+  height: 100dvh;
   border-radius: 0;
   display: flex;
   flex-direction: column;
@@ -1776,5 +1779,263 @@ h1 > span:not(.title-star) {
   .primary:hover,
   .skill:hover:not(:disabled) {
     transform: none;
+  }
+}
+
+.mobile-skill-hud {
+  display: none;
+}
+.rotation-hint {
+  position: absolute;
+  top: 106px;
+  right: 14px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  background: #fffdf0dd;
+  color: #75856c;
+  font-size: 7px;
+  pointer-events: none;
+}
+
+/* Touch landscape has its own game layout. Desktop and portrait keep the
+   landing page and original cards. Safe-area variables are also testable. */
+@media (orientation: landscape) and (max-height: 540px) and (pointer: coarse) {
+  body.game-immersive {
+    height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  .shell.immersive {
+    width: 100dvw;
+    height: 100dvh;
+    max-width: none;
+    padding: 0;
+    overflow: hidden;
+  }
+  .immersive > .header,
+  .immersive > .intro,
+  .immersive > .below,
+  .immersive > .footer,
+  .immersive > .debug {
+    display: none;
+  }
+  .immersive .arena {
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    position: fixed;
+    inset: 0;
+    width: 100dvw;
+    height: 100dvh;
+    display: block;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: #f4ead1;
+  }
+  .immersive .controls,
+  .immersive .stage-bottom {
+    display: none;
+  }
+  .immersive .game-stage {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border: 0;
+  }
+  .immersive .game-stage canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  .immersive .hud {
+    padding: max(11px, var(--safe-top)) max(16px, calc(var(--safe-right) + 8px))
+      0 max(16px, calc(var(--safe-left) + 8px));
+    gap: 24px;
+    align-items: flex-start;
+  }
+  .immersive .hud-label {
+    font-size: 8px;
+    margin-bottom: 6px;
+  }
+  .immersive .health svg {
+    width: 18px;
+    height: 18px;
+  }
+  .immersive .score strong {
+    font-size: 24px;
+  }
+  .immersive .stage-time {
+    margin-right: 12px;
+  }
+  .immersive .stage-time strong {
+    font-size: 24px;
+  }
+  .immersive .progress {
+    width: 82px;
+  }
+  .immersive .game-tools {
+    padding-top: 0;
+    gap: 7px;
+  }
+  .immersive .game-tools button {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #fffdf2a8;
+  }
+  .immersive .chapter-chip {
+    top: auto;
+    bottom: calc(var(--safe-bottom) + 38px);
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: max(
+      100px,
+      calc(100dvw - 420px - var(--safe-left) - var(--safe-right))
+    );
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 9px;
+    padding: 6px 9px;
+  }
+  .immersive .combo {
+    top: calc(max(11px, var(--safe-top)) + 52px);
+    right: max(20px, calc(var(--safe-right) + 8px));
+  }
+  .immersive .combo strong {
+    font-size: 44px;
+  }
+  .immersive .combo span {
+    font-size: 16px;
+  }
+  .immersive .mobile-skill-hud {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .thumb-controls {
+    position: absolute;
+    bottom: calc(var(--safe-bottom) + 12px);
+    display: flex;
+    gap: 10px;
+    pointer-events: auto;
+  }
+  .thumb-left {
+    left: max(16px, calc(var(--safe-left) + 8px));
+  }
+  .thumb-right {
+    right: max(16px, calc(var(--safe-right) + 8px));
+  }
+  .thumb-skill {
+    width: 80px;
+    height: 80px;
+    padding: 4px;
+    border: 0;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    touch-action: none;
+    user-select: none;
+  }
+  .thumb-face {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 19px;
+    background: #fffdf0b8;
+    border: 1.5px solid color-mix(in srgb, var(--skill) 55%, transparent);
+    box-shadow: 0 3px 0 color-mix(in srgb, var(--skill) 35%, transparent);
+    transition:
+      transform 0.08s,
+      background 0.08s,
+      box-shadow 0.08s;
+    color: #35494a;
+  }
+  .thumb-face svg {
+    width: 42px;
+    height: 35px;
+    color: var(--skill);
+  }
+  .thumb-face strong {
+    font-size: 16px;
+    letter-spacing: -0.5px;
+  }
+  .thumb-skill.active .thumb-face,
+  .thumb-skill:active .thumb-face {
+    transform: translateY(2px) scale(0.94);
+    background: color-mix(in srgb, var(--skill) 20%, #fffdf0dd);
+    box-shadow:
+      0 0 0 2px var(--skill),
+      0 0 20px color-mix(in srgb, var(--skill) 40%, transparent);
+  }
+  .thumb-skill.queued .thumb-face {
+    outline: 2px dashed var(--skill);
+    outline-offset: 3px;
+  }
+  .thumb-skill:disabled {
+    opacity: 0.25;
+  }
+  .immersive .overlay {
+    padding: max(12px, var(--safe-top)) max(12px, var(--safe-right))
+      max(12px, var(--safe-bottom)) max(12px, var(--safe-left));
+    z-index: 5;
+  }
+  .immersive .modal {
+    max-height: calc(
+      100dvh - max(12px, var(--safe-top)) - max(12px, var(--safe-bottom))
+    );
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: 14px 24px;
+  }
+  .immersive .result {
+    max-width: 360px;
+  }
+  .immersive .result-icon {
+    width: 30px;
+    height: 30px;
+    margin-bottom: 4px;
+  }
+  .immersive .result-icon svg {
+    width: 20px;
+  }
+  .immersive .result h2 {
+    font-size: 26px;
+    margin: 4px 0;
+  }
+  .immersive .result p {
+    font-size: 9px;
+    margin-bottom: 10px;
+  }
+  .immersive .result-score {
+    padding: 6px 14px;
+    margin-bottom: 10px;
+  }
+  .immersive .result-score strong {
+    font-size: 29px;
+  }
+  .immersive .result-stats {
+    margin-bottom: 10px;
+  }
+  .immersive .result-stats strong {
+    font-size: 22px;
+  }
+  .immersive .result .primary {
+    padding: 10px;
+    min-height: 40px;
+  }
+  .immersive .result > small {
+    margin-top: 10px;
   }
 }
