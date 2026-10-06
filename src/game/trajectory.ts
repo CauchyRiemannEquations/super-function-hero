@@ -28,9 +28,9 @@ export const SKILLS = {
     name: "포물선 내려찍기",
     english: "POWER DIVE",
     color: "#efb636",
-    distance: 220,
-    duration: 0.5,
-    hint: "아래로 꽂히는 강력한 한 방",
+    distance: 120,
+    duration: 0.34,
+    hint: "공중에서 급제동 · 충격판과 바닥 파괴",
   },
   wave: {
     key: "4",
@@ -49,13 +49,14 @@ export function trajectory(
   skill: Skill,
   start: Point,
   progress: number,
+  floor = FLOOR,
 ): Point {
   const t = Math.max(0, Math.min(1, progress));
   const x = start.x + SKILLS[skill].distance * t;
   if (skill === "line") return { x, y: start.y - 44 * t };
   if (skill === "rise")
     return { x, y: start.y - Math.min(212, start.y - 64) * t * t };
-  if (skill === "dive") return { x, y: start.y + (FLOOR - start.y) * t * t };
+  if (skill === "dive") return { x, y: start.y + (floor - start.y) * t * t };
   return {
     x,
     y:

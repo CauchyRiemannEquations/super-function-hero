@@ -17,10 +17,11 @@ import {
   Trophy,
 } from "lucide-react";
 import { Game, INITIAL, type Snapshot } from "./game/engine";
-import { CHAPTERS, DURATION } from "./game/stage";
+import { CHAPTERS, DURATION, REQUIRED_CORES } from "./game/stage";
 import { SKILLS, type Skill } from "./game/trajectory";
 import Graph from "./components/SkillGraph";
 import MobileSkills from "./components/MobileSkills";
+import TitleScreen from "./components/TitleScreen";
 import {
   MOBILE_LANDSCAPE,
   enterGameFullscreen,
@@ -51,7 +52,7 @@ export default function App() {
     [best, setBest] = useState(0);
   const landscape = useMediaQuery(MOBILE_LANDSCAPE);
   const touch = useMediaQuery("(pointer: coarse)");
-  const immersive = landscape && state.phase !== "ready";
+  const immersive = landscape;
   useLayoutEffect(() => {
     const scroll = window.scrollY;
     document.body.classList.toggle("game-immersive", immersive);
@@ -70,6 +71,7 @@ export default function App() {
     }
     const game = new Game(canvas.current!, setState);
     engine.current = game;
+    game.setImmersive(matchMedia(MOBILE_LANDSCAPE).matches);
     if (import.meta.env.DEV)
       (window as unknown as { __curveGame?: Game }).__curveGame = game;
     return () => {
@@ -135,12 +137,14 @@ export default function App() {
   return (
     <main className={`shell ${immersive ? "immersive" : ""}`}>
       <header className="header">
-        <a className="brand" href="./" aria-label="CURVE RUN 홈">
+        <a className="brand" href="./" aria-label="Super Function Hero 홈">
           <span className="brand-mark">
             <Zap size={23} strokeWidth={2.5} />
           </span>
           <span>
-            CURVE<span className="brand-light">RUN</span>
+            <span className="brand-word">
+              SUPER FUNCTION <b>HERO</b>
+            </span>
             <i />
           </span>
         </a>
@@ -178,15 +182,18 @@ export default function App() {
             <Flag size={23} />
           </span>
           <div>
-            <span>MISSION 01</span>
-            <strong>루프탑 러시</strong>
-            <small>38초 · 곡선을 잇는 첫 번째 모험</small>
+            <span>RUN 01 / V0.2</span>
+            <strong>스카이라인 돌파</strong>
+            <small>60초 · CORE로 길을 여는 연속 코스</small>
           </div>
           <ArrowUpRight size={20} />
         </div>
       </section>
 
-      <div className={`arena ${fullscreen ? "fullscreen" : ""}`} ref={arena}>
+      <div
+        className={`arena ${fullscreen ? "fullscreen" : ""} ${state.phase === "ready" ? "is-ready" : ""}`}
+        ref={arena}
+      >
         <section className="game-stage" aria-label="게임 화면">
           <canvas
             ref={canvas}
@@ -209,6 +216,13 @@ export default function App() {
             <div className="score">
               <span className="hud-label">SCORE</span>
               <strong>{String(state.score).padStart(6, "0")}</strong>
+            </div>
+            <div className="core-counter">
+              <span className="hud-label">CORE</span>
+              <strong>
+                {state.cores}
+                <small>/{REQUIRED_CORES}</small>
+              </strong>
             </div>
             <div className="stage-time">
               <span className="hud-label">STAGE 01</span>
@@ -245,7 +259,7 @@ export default function App() {
                   <Pause size={18} />
                 )}
               </button>
-              {immersive && (
+              {immersive && state.phase !== "ready" && (
                 <button aria-label="게임 화면 나가기" onClick={exit}>
                   <X size={18} />
                 </button>
@@ -270,36 +284,7 @@ export default function App() {
             </div>
           )}
           {state.phase === "ready" && !help && (
-            <div className="ready-content">
-              <span className="pill">
-                <span /> READY TO MAKE A MOVE?
-              </span>
-              <h2>
-                공식 말고,
-                <br />
-                <em>액션으로.</em>
-              </h2>
-              <p>
-                누르는 순간, 그래프가 움직임이 됩니다.
-                <br />네 가지 기술로 나만의 콤보를 만드세요.
-              </p>
-              <button className="primary" onClick={start}>
-                플레이 시작 <ArrowUpRight size={21} />
-              </button>
-              <small>
-                <kbd>Enter</kbd> 로 시작 · 38초의 짧은 러시
-              </small>
-            </div>
-          )}
-          {state.phase === "ready" && !help && (
-            <div className="ready-annotation">
-              <span className="annotation-arrow">↗</span>
-              <span>
-                YOUR CURVE.
-                <br />
-                YOUR MOVE.
-              </span>
-            </div>
+            <TitleScreen start={start} help={openHelp} />
           )}
           {state.phase === "paused" && !help && (
             <div className="overlay">
@@ -348,8 +333,8 @@ export default function App() {
                 </h2>
                 <p>
                   {state.phase === "clear"
-                    ? "옥상 끝까지 도착! 이번엔 더 긴 콤보에 도전해 보세요."
-                    : "곡선 하나가 흐름을 바꿔요. 바로 다시 달려볼까요?"}
+                    ? "모든 CORE를 열고 스카이라인을 돌파했습니다."
+                    : state.failure || "다음 곡선으로 다시 돌파해 보세요."}
                 </p>
                 <div className="result-score">
                   <span>FINAL SCORE</span>
@@ -367,6 +352,12 @@ export default function App() {
                   <div>
                     <span>HITS</span>
                     <strong>{state.kills}</strong>
+                  </div>
+                  <div>
+                    <span>CORE</span>
+                    <strong>
+                      {state.cores}/{REQUIRED_CORES}
+                    </strong>
                   </div>
                 </div>
                 <button className="primary" onClick={start}>
@@ -397,7 +388,8 @@ export default function App() {
                 <span className="eyebrow">HOW TO FLOW</span>
                 <h2>보이는 곡선대로, 움직이세요.</h2>
                 <p>
-                  캐릭터는 자동으로 달립니다. 적이 가까워지면 기술을 누르세요.
+                  HAZARD는 피하고, ENEMY는 보너스. CORE를 깨면 연결된 문이
+                  열립니다.
                 </p>
                 <div className="guide-skills">
                   {(Object.keys(SKILLS) as Skill[]).map((k) => (
@@ -413,9 +405,9 @@ export default function App() {
                   ))}
                 </div>
                 <p className="guide-note">
-                  공중에서 2 → 3을 연결해 보세요. 내려찍기는 지상에서도 도약 후
-                  발동합니다. 적을 놓쳐도 계속 달릴 수 있지만, 충돌 3회면 러시가
-                  끝납니다.
+                  공중에서 시작한 급강하만 충격판과 금 간 바닥을 부숩니다. 지상
+                  급강하는 짧은 공격입니다. 적은 놓쳐도 계속 달립니다. 붉은
+                  위험물과 닫힌 문에 충돌하면 HP가 줄어듭니다.
                 </p>
                 <button
                   className="primary"
@@ -541,7 +533,7 @@ export default function App() {
       </section>
       <footer className="footer">
         <span>
-          CURVE RUN <b>© 2026</b>
+          SUPER FUNCTION HERO <b>© 2026</b>
         </span>
         <span>
           FOUR FUNCTIONS. INFINITE FLOW.<i>↗</i>
