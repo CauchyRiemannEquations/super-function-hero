@@ -1,0 +1,113 @@
+{
+  "checkedAt": "2026-10-06",
+  "browser": "Chromium desktop and mobile touch emulation",
+  "browserChecks": [
+    {
+      "name": "Ready screen starts normally",
+      "passed": true
+    },
+    {
+      "name": "Enter starts stage",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 1 triggers line",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 2 triggers rise",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 3 triggers dive",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 4 triggers wave",
+      "passed": true
+    },
+    {
+      "name": "Distinct normalized vertical trajectories",
+      "passed": true
+    },
+    {
+      "name": "Pause freezes simulation",
+      "passed": true
+    },
+    {
+      "name": "Stage can clear with actual timed keyboard input and normal HP",
+      "passed": true
+    },
+    {
+      "name": "Combat, combo and Perfect work",
+      "passed": true
+    },
+    {
+      "name": "Wave multihit and uppercut-to-dive special combo work",
+      "passed": true
+    },
+    {
+      "name": "Result Restart immediately resets HP and score",
+      "passed": true
+    },
+    {
+      "name": "Enemy collision reduces HP and reaches Game Over",
+      "passed": true
+    },
+    {
+      "name": "Game Over Restart works",
+      "passed": true
+    },
+    {
+      "name": "Mobile touch triggers skill 1",
+      "passed": true
+    },
+    {
+      "name": "Mobile touch triggers skill 2",
+      "passed": true
+    },
+    {
+      "name": "Mobile touch triggers skill 3",
+      "passed": true
+    },
+    {
+      "name": "Mobile touch triggers skill 4",
+      "passed": true
+    },
+    {
+      "name": "390px mobile buttons visible and touch-sized",
+      "passed": true
+    },
+    {
+      "name": "320px mobile layout has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "No browser errors",
+      "passed": true
+    }
+  ],
+  "trajectoryTests": 4,
+  "failedChecks": 0,
+  "browserErrors": [],
+  "consoleErrors": [],
+  "gameplay": {
+    "kills": 18,
+    "maxCombo": 17,
+    "perfects": 12,
+    "score": 4936,
+    "hp": 3,
+    "stageSeconds": 38
+  },
+  "production": {
+    "standaloneFileLoad": true,
+    "keyboard": true,
+    "pause": true,
+    "restart": true,
+    "combatScore": 150,
+    "devUIHidden": true,
+    "devEngineAbsent": true,
+    "browserErrors": []
+  },
+  "limitation": "Physical iOS/Android performance and audio behavior were not tested."
+}
