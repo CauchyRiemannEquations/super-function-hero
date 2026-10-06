@@ -1,4 +1,5 @@
 import { AudioFx } from "./audio";
+import { LANDSCAPE_QUERY } from "./browser-mode";
 import {
   SkillInputBuffer,
   INPUT_BUFFER_SECONDS,
@@ -130,6 +131,13 @@ export class Game {
   action: Action | null = null;
   audio = new AudioFx();
   artReady = false;
+  private orientationMedia = window.matchMedia(LANDSCAPE_QUERY);
+  playAllowed = this.orientationMedia.matches;
+  get canPlay() {
+    return this.playAllowed && this.orientationMedia.matches;
+  }
+  private onOrientation = () =>
+    this.setPlayAllowed(this.orientationMedia.matches);
   debug = { hitboxes: false, invincible: false, speed: 1 };
   width = 1160;
   height = WORLD_HEIGHT;
@@ -164,6 +172,7 @@ export class Game {
   private reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
     .matches;
   private onKey = (e: KeyboardEvent) => {
+    if (!this.canPlay) return;
     if (
       e.target instanceof HTMLInputElement ||
       e.target instanceof HTMLSelectElement ||
@@ -201,6 +210,7 @@ export class Game {
     this.resize();
     window.addEventListener("keydown", this.onKey);
     document.addEventListener("visibilitychange", this.onVisibility);
+    this.orientationMedia.addEventListener("change", this.onOrientation);
     this.frame = requestAnimationFrame(this.loop);
   }
   private resize = () => {
@@ -209,10 +219,12 @@ export class Game {
     const oldAnchor = this.anchor;
     const controls =
       this.canvas.parentElement?.querySelector(".thumb-controls");
-    this.protectedBottom =
-      this.immersive && controls
-        ? Math.max(104, box.bottom - controls.getBoundingClientRect().top + 24)
-        : 0;
+    const controlBox = controls?.getBoundingClientRect();
+    this.protectedBottom = this.immersive
+      ? controlBox && controlBox.height > 0
+        ? Math.max(104, box.bottom - controlBox.top + 24)
+        : 116
+      : 0;
     const viewport = fitViewport(box.width, box.height, this.protectedBottom);
     this.width = viewport.width;
     this.viewHeight = viewport.height;
@@ -225,11 +237,20 @@ export class Game {
     this.immersive = value;
     this.resize();
   }
+  setPlayAllowed(value: boolean) {
+    this.playAllowed = value;
+    if (!value) {
+      this.input.clear();
+      this.state.bufferedSkill = null;
+      if (this.state.phase === "playing") this.pause();
+    }
+  }
   dispose() {
     cancelAnimationFrame(this.frame);
     this.resizeObserver.disconnect();
     window.removeEventListener("keydown", this.onKey);
     document.removeEventListener("visibilitychange", this.onVisibility);
+    this.orientationMedia.removeEventListener("change", this.onOrientation);
     this.audio.dispose();
   }
   emit() {
@@ -241,7 +262,7 @@ export class Game {
     this.notify({ ...this.state });
   }
   start() {
-    if (!this.artReady) return;
+    if (!this.artReady || !this.canPlay) return;
     this.audio.unlock();
     this.reset("playing");
   }
@@ -277,9 +298,11 @@ export class Game {
     this.input.clear();
     this.state.bufferedSkill = null;
     this.state.phase = "paused";
+    this.accumulator = 0;
     this.emit();
   }
   togglePause() {
+    if (!this.canPlay) return;
     if (this.state.phase === "playing") this.pause();
     else if (this.state.phase === "paused") {
       this.audio.unlock();
@@ -288,7 +311,7 @@ export class Game {
     }
   }
   cast(skill: Skill) {
-    if (this.state.phase !== "playing") return;
+    if (this.state.phase !== "playing" || !this.canPlay) return;
     const remaining = this.action
       ? SKILLS[this.action.skill].duration -
         this.action.elapsed +
@@ -357,7 +380,7 @@ export class Game {
     this.previous = now;
     this.tick += dt;
     this.state.fps += (1 / Math.max(dt, 0.001) - this.state.fps) * 0.04;
-    if (this.state.phase === "playing") {
+    if (this.state.phase === "playing" && this.canPlay) {
       this.effects(dt);
       if (this.hitstop > 0) this.hitstop -= dt;
       else {
@@ -374,7 +397,7 @@ export class Game {
         if (this.hitstop > 0) this.accumulator = 0;
       }
     }
-    this.render();
+    if (this.canPlay) this.render();
     this.publishTime += dt;
     if (this.publishTime > 0.06) {
       this.publishTime = 0;
@@ -412,6 +435,7 @@ export class Game {
     });
   }
   private update(dt: number) {
+    if (!this.canPlay) return;
     this.state.time += dt;
     if (
       this.state.route === "lower" &&

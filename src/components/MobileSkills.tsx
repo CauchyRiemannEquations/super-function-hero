@@ -21,11 +21,13 @@ export default function MobileSkills({
   queued,
   enabled,
   cast,
+  showKeys = false,
 }: {
   active: Skill | null;
   queued: Skill | null;
   enabled: boolean;
   cast: (skill: Skill) => void;
+  showKeys?: boolean;
 }) {
   return (
     <div className="mobile-skill-hud" aria-label="인게임 함수 기술">
@@ -54,6 +56,9 @@ export default function MobileSkills({
               }}
             >
               <span className="thumb-face">
+                {showKeys && (
+                  <kbd className="thumb-key">{SKILLS[skill].key}</kbd>
+                )}
                 <SkillGraph skill={skill} />
                 <strong>{SHORT[skill]}</strong>
               </span>

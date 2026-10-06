@@ -4,7 +4,7 @@
 
 | 파일                            | 역할                    | source rect (x,y,width,height) |
 | ------------------------------- | ----------------------- | ------------------------------ |
-| src/assets/logo.png             | 타이틀·헤더의 실제 로고 | DOM에서 원본 사용              |
+| src/assets/logo.png             | 타이틀·회전 안내의 로고 | DOM에서 원본 사용              |
 | src/assets/bot.png              | 지상 ENEMY              | 343,252,580,747                |
 | src/assets/drone.png            | 공중 ENEMY              | 71,390,1122,478                |
 | src/assets/core.png             | CORE·충격판             | 148,101,968,1062               |

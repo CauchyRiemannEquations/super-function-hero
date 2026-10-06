@@ -20,4 +20,8 @@ assets.ts는 제공 PNG의 alpha bbox를 캔버스에 최대 384px로 캐시합�
 
 npm test: 기존 물리·역할·버퍼 14개에, 패턴 exit window / 연속 속도 / 환경 혼합·반응 보정을 추가했습니다. npm run standalone은 이미지를 포함한 단일 HTML을 생성합니다. dist 이미지 URL뿐 아니라 상대 base의 new URL(file,import.meta.url)도 포장합니다.
 
-모바일 가로의 동일 크기 프레임, 80px 좌우 2+2 버튼, safe-area, 균일 배율과 DPR을 유지합니다. 실제 장치 성능·오디오·네이티브 fullscreen/orientation API는 에뮬레이션으로 대체할 수 없으므로 별도 확인이 필요합니다.
+모든 가로 화면에서 타이틀·플레이·결과가 100dvw × 100dvh 게임 프레임을 공유합니다. 페이지형 헤더·소개·외부 조작 카드·설명·푸터는 DOM에서 제거했습니다. 좌우 2+2 버튼, safe-area, 균일 배율과 DPR을 유지하며 데스크톱 버튼에는 1~4 키 힌트를 표시합니다.
+
+orientation media query를 React와 엔진에서 구독합니다. 세로에서는 game-stage를 inert로 만들고 회전 안내만 표시합니다. 안내는 fullscreen 대상 arena 내부에 있어 native fullscreen 중 회전해도 표시됩니다. 엔진 canPlay 검사도 start/cast/pause/key/update/loop에 적용해 UI 밖의 입력으로 우회할 수 없게 했습니다. 세로 전환 시 예약 입력과 accumulator를 비우고 현재 진행을 일시정지합니다. 가로 복귀 후 자동 재개하지 않으며 HP·시간·진행은 보존합니다.
+
+실제 장치 성능·오디오·네이티브 fullscreen/orientation API는 에뮬레이션으로 대체할 수 없으므로 별도 확인이 필요합니다.
