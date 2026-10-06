@@ -1,5 +1,11 @@
 import { AudioFx } from "./audio";
 import {
+  SkillInputBuffer,
+  INPUT_BUFFER_SECONDS,
+  INPUT_GUARD_SECONDS,
+} from "./input";
+import { fitViewport, WORLD_HEIGHT } from "./viewport";
+import {
   CHAPTERS,
   DURATION,
   ENCOUNTERS,
@@ -51,6 +57,7 @@ export type Snapshot = {
   perfects: number;
   time: number;
   skill: Skill | null;
+  bufferedSkill: Skill | null;
   chapter: number;
   fps: number;
   x: number;
@@ -72,6 +79,7 @@ export const INITIAL: Snapshot = {
   perfects: 0,
   time: 0,
   skill: null,
+  bufferedSkill: null,
   chapter: 0,
   fps: 60,
   x: 180,
@@ -95,7 +103,11 @@ export class Game {
   audio = new AudioFx();
   debug = { hitboxes: false, invincible: false, speed: 1 };
   width = 1160;
-  height = 460;
+  height = WORLD_HEIGHT;
+  viewHeight = WORLD_HEIGHT;
+  immersive = false;
+  protectedBottom = 0;
+  input = new SkillInputBuffer();
   camera = 0;
   shake = 0;
   hitstop = 0;
@@ -125,7 +137,7 @@ export class Game {
     ) as Skill | undefined;
     if (key) {
       e.preventDefault();
-      this.cast(key);
+      if (!e.repeat) this.cast(key);
     }
     if (e.code === "Space" || e.code === "Escape") {
       e.preventDefault();
@@ -155,15 +167,26 @@ export class Game {
   }
   private resize = () => {
     const box = this.canvas.getBoundingClientRect();
-    // Keep both axes at the same scale: helmets and attack rings stay round
-    // in portrait, and the same path geometry drives every screen size.
-    this.width = Math.round(
-      (box.width / Math.max(1, box.height)) * this.height,
-    );
+    if (box.width <= 0 || box.height <= 0) return;
+    const oldAnchor = this.anchor;
+    const controls =
+      this.canvas.parentElement?.querySelector(".thumb-controls");
+    this.protectedBottom =
+      this.immersive && controls
+        ? Math.max(104, box.bottom - controls.getBoundingClientRect().top + 24)
+        : 0;
+    const viewport = fitViewport(box.width, box.height, this.protectedBottom);
+    this.width = viewport.width;
+    this.viewHeight = viewport.height;
+    this.camera += oldAnchor - this.anchor;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.canvas.width = Math.round(box.width * dpr);
     this.canvas.height = Math.round(box.height * dpr);
   };
+  setImmersive(value: boolean) {
+    this.immersive = value;
+    this.resize();
+  }
   dispose() {
     cancelAnimationFrame(this.frame);
     this.resizeObserver.disconnect();
@@ -180,7 +203,14 @@ export class Game {
   }
   start() {
     this.audio.unlock();
-    this.state = { ...INITIAL, phase: "playing" };
+    this.reset("playing");
+  }
+  returnToTitle() {
+    this.reset("ready");
+  }
+  private reset(phase: Phase) {
+    this.state = { ...INITIAL, phase };
+    this.input.clear();
     this.player = { x: 180, y: FLOOR, vy: 0, invulnerable: 0 };
     this.enemies = [];
     this.trails = [];
@@ -201,6 +231,8 @@ export class Game {
     return this.width < 800 ? this.width * 0.25 : 206;
   }
   pause() {
+    this.input.clear();
+    this.state.bufferedSkill = null;
     this.state.phase = "paused";
     this.emit();
   }
@@ -213,11 +245,28 @@ export class Game {
     }
   }
   cast(skill: Skill) {
-    if (
-      this.state.phase !== "playing" ||
-      this.state.time - this.lastCast < 0.12
-    )
+    if (this.state.phase !== "playing") return;
+    const remaining = this.action
+      ? SKILLS[this.action.skill].duration -
+        this.action.elapsed +
+        (this.state.motion === "hop" ? 0.17 : 0)
+      : 0;
+    const finishSoon =
+      !!this.action &&
+      skill !== this.action.skill &&
+      remaining > 0 &&
+      remaining <= INPUT_BUFFER_SECONDS;
+    if (this.state.time - this.lastCast < INPUT_GUARD_SECONDS || finishSoon) {
+      this.input.queue(skill, this.state.time, finishSoon);
+      this.state.bufferedSkill = skill;
+      this.emit();
       return;
+    }
+    this.activate(skill);
+  }
+  private activate(skill: Skill) {
+    this.input.clear();
+    this.state.bufferedSkill = null;
     this.audio.unlock();
     this.audio.play("skill", Object.keys(SKILLS).indexOf(skill));
     this.lastCast = this.state.time;
@@ -315,6 +364,13 @@ export class Game {
   }
   private update(dt: number) {
     this.state.time += dt;
+    const buffered = this.input.consume(
+      this.state.time,
+      this.state.time - this.lastCast >= INPUT_GUARD_SECONDS,
+      !this.action,
+    );
+    this.state.bufferedSkill = this.input.pending?.skill ?? null;
+    if (buffered) this.activate(buffered);
     this.player.invulnerable = Math.max(0, this.player.invulnerable - dt);
     while (
       this.spawned < ENCOUNTERS.length &&
@@ -408,8 +464,21 @@ export class Game {
     );
     if (this.state.combo > 0 && this.state.time - this.lastCombo > 6.5)
       this.state.combo = 0;
+    // End-window inputs start on this very simulation step, after the old
+    // action's final collision/splash has been resolved.
+    if (!this.action && this.state.phase === "playing") {
+      const next = this.input.consume(
+        this.state.time,
+        this.state.time - this.lastCast >= INPUT_GUARD_SECONDS,
+        true,
+      );
+      this.state.bufferedSkill = this.input.pending?.skill ?? null;
+      if (next) this.activate(next);
+    }
     if (this.state.time >= DURATION && this.state.phase === "playing") {
       this.state.phase = "clear";
+      this.input.clear();
+      this.state.bufferedSkill = null;
       this.endTrail();
       this.audio.play("clear");
       this.emit();
@@ -476,6 +545,8 @@ export class Game {
     this.state.lastEvent = "DAMAGE";
     if (this.state.hp <= 0) {
       this.state.phase = "over";
+      this.input.clear();
+      this.state.bufferedSkill = null;
       this.endTrail();
       this.emit();
     }
@@ -524,7 +595,7 @@ export class Game {
   private render() {
     const c = this.ctx,
       w = this.width,
-      h = this.height;
+      h = this.viewHeight;
     c.setTransform(this.canvas.width / w, 0, 0, this.canvas.height / h, 0, 0);
     c.clearRect(0, 0, w, h);
     c.lineCap = "round";
@@ -628,7 +699,7 @@ export class Game {
     gradient.addColorStop(0, "#edf0e9");
     gradient.addColorStop(1, "#f6efd9");
     c.fillStyle = gradient;
-    c.fillRect(0, 0, w, 460);
+    c.fillRect(0, 0, w, this.viewHeight);
     c.strokeStyle = "#dde3d7";
     c.lineWidth = 1;
     for (let x = 0; x < w; x += 58) {
@@ -696,14 +767,14 @@ export class Game {
       }
     }
     c.fillStyle = "#f4ead1";
-    c.fillRect(0, 376, w, 84);
+    c.fillRect(0, 376, w, this.viewHeight - 376);
     c.fillStyle = "#31484e";
     c.fillRect(0, 376, w, 7);
     c.fillStyle = "#cbd5b8";
     c.fillRect(0, 384, w, 12);
     c.strokeStyle = "#dfd4b8";
     c.lineWidth = 1;
-    for (let y = 412; y < 460; y += 27) {
+    for (let y = 412; y < this.viewHeight; y += 27) {
       c.beginPath();
       c.moveTo(0, y);
       c.lineTo(w, y);
@@ -714,7 +785,7 @@ export class Game {
       c.strokeStyle = "#e0d5bd";
       c.beginPath();
       c.moveTo(x, 396);
-      c.lineTo(x - 38, 460);
+      c.lineTo(x - 38, this.viewHeight);
       c.stroke();
       c.fillStyle = "#b3bfa5";
       c.fillRect(x + 47, 386, 24, 3);

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
   AudioLines,
@@ -19,41 +19,24 @@ import {
 import { Game, INITIAL, type Snapshot } from "./game/engine";
 import { CHAPTERS, DURATION } from "./game/stage";
 import { SKILLS, type Skill } from "./game/trajectory";
+import Graph from "./components/SkillGraph";
+import MobileSkills from "./components/MobileSkills";
+import {
+  MOBILE_LANDSCAPE,
+  enterGameFullscreen,
+  leaveGameFullscreen,
+} from "./game/browser-mode";
 
-function Graph({
-  skill,
-  className = "",
-}: {
-  skill: Skill;
-  className?: string;
-}) {
-  const paths = {
-    line: "M12 54 L64 12",
-    rise: "M10 52 Q46 52 64 10",
-    dive: "M10 12 Q46 12 64 54",
-    wave: "M5 34 C14 5 25 5 34 34 S54 63 65 34 S77 9 83 22",
-  };
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 88 68"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M8 8 V58 H80"
-        stroke="currentColor"
-        opacity=".17"
-        strokeWidth="1.5"
-      />
-      <path
-        d={paths[skill]}
-        stroke="currentColor"
-        strokeWidth="4.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(() => matchMedia(query).matches);
+  useEffect(() => {
+    const media = matchMedia(query);
+    const update = () => setMatches(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, [query]);
+  return matches;
 }
 
 export default function App() {
@@ -66,6 +49,19 @@ export default function App() {
     [debug, setDebug] = useState(false);
   const [fullscreen, setFullscreen] = useState(false),
     [best, setBest] = useState(0);
+  const landscape = useMediaQuery(MOBILE_LANDSCAPE);
+  const touch = useMediaQuery("(pointer: coarse)");
+  const immersive = landscape && state.phase !== "ready";
+  useLayoutEffect(() => {
+    const scroll = window.scrollY;
+    document.body.classList.toggle("game-immersive", immersive);
+    engine.current?.setImmersive(immersive);
+    if (immersive) window.scrollTo(0, 0);
+    return () => {
+      document.body.classList.remove("game-immersive");
+      if (immersive) window.scrollTo(0, scroll);
+    };
+  }, [immersive]);
   useEffect(() => {
     try {
       setBest(Number(localStorage.getItem("curve-run-best") || 0));
@@ -94,13 +90,29 @@ export default function App() {
     }
   }, [state.phase, state.score, best]);
   useEffect(() => {
-    const onFull = () => setFullscreen(Boolean(document.fullscreenElement));
+    const onFull = () => {
+      setFullscreen(Boolean(document.fullscreenElement));
+      if (!document.fullscreenElement) {
+        try {
+          screen.orientation?.unlock?.();
+        } catch {
+          /* Optional API. */
+        }
+      }
+    };
     document.addEventListener("fullscreenchange", onFull);
     return () => document.removeEventListener("fullscreenchange", onFull);
   }, []);
   const start = () => {
     setHelp(false);
     engine.current?.start();
+    if (landscape && arena.current)
+      void enterGameFullscreen(arena.current, true);
+  };
+  const exit = () => {
+    setHelp(false);
+    engine.current?.returnToTitle();
+    void leaveGameFullscreen();
   };
   const sound = () => {
     const next = !muted;
@@ -115,18 +127,13 @@ export default function App() {
     setHelp(true);
   };
   const full = async () => {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else if (arena.current?.requestFullscreen)
-        await arena.current.requestFullscreen();
-    } catch {
-      /* The game remains playable if the browser disallows fullscreen. */
-    }
+    if (document.fullscreenElement) await leaveGameFullscreen();
+    else if (arena.current) await enterGameFullscreen(arena.current, landscape);
   };
   const playable = state.phase === "playing";
   const chapter = CHAPTERS[state.chapter];
   return (
-    <main className="shell">
+    <main className={`shell ${immersive ? "immersive" : ""}`}>
       <header className="header">
         <a className="brand" href="./" aria-label="CURVE RUN 홈">
           <span className="brand-mark">
@@ -238,8 +245,18 @@ export default function App() {
                   <Pause size={18} />
                 )}
               </button>
+              {immersive && (
+                <button aria-label="게임 화면 나가기" onClick={exit}>
+                  <X size={18} />
+                </button>
+              )}
             </div>
           </div>
+          {touch && !landscape && playable && (
+            <span className="rotation-hint">
+              ↔ 가로로 돌리면 더 넓게 플레이할 수 있어요
+            </span>
+          )}
           {playable && (
             <div className="chapter-chip" key={`chapter-${state.chapter}`}>
               <span>0{state.chapter + 1} /</span>
@@ -300,6 +317,11 @@ export default function App() {
                   <RotateCcw size={16} />
                   처음부터 다시
                 </button>
+                {immersive && (
+                  <button className="secondary" onClick={exit}>
+                    타이틀로 돌아가기
+                  </button>
+                )}
                 <small>Space / Esc로 계속하기</small>
               </div>
             </div>
@@ -350,6 +372,11 @@ export default function App() {
                 <button className="primary" onClick={start}>
                   다시 달리기 <RotateCcw size={18} />
                 </button>
+                {immersive && (
+                  <button className="secondary" onClick={exit}>
+                    타이틀로 돌아가기
+                  </button>
+                )}
                 <small>
                   최고 기록 {Math.max(best, state.score).toLocaleString()} ·
                   Enter / R로 즉시 재도전
@@ -401,6 +428,14 @@ export default function App() {
                 </button>
               </div>
             </div>
+          )}
+          {immersive && (
+            <MobileSkills
+              active={state.skill}
+              queued={state.bufferedSkill}
+              enabled={playable}
+              cast={(skill) => engine.current?.cast(skill)}
+            />
           )}
           <div className="stage-bottom">
             <span>
