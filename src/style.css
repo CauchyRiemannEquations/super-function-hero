@@ -1785,6 +1785,228 @@ h1 > span:not(.title-star) {
 .mobile-skill-hud {
   display: none;
 }
+
+.brand-word {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+}
+.brand-word b {
+  color: var(--coral);
+  font-weight: 900;
+}
+.core-counter strong {
+  font: 800 24px "Barlow Condensed";
+  color: #b08726;
+}
+.core-counter small {
+  font: 600 10px "DM Sans";
+  margin-left: 3px;
+}
+.hud {
+  z-index: 4;
+  background: linear-gradient(180deg, #f7f8ede8, #f7f8eda8);
+  padding-bottom: 9px;
+  border-bottom: 1px solid #dae1ce70;
+}
+.is-ready .hud {
+  background: none;
+  border: 0;
+}
+.is-ready .health,
+.is-ready .score,
+.is-ready .core-counter,
+.is-ready .stage-time {
+  visibility: hidden;
+}
+.is-ready .game-tools button[aria-label="일시정지"] {
+  display: none;
+}
+.is-ready .mobile-skill-hud {
+  visibility: hidden;
+}
+.title-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    #f1f2e9e8 0%,
+    #f1f2e9d0 24%,
+    #f1f2e900 62%
+  );
+}
+.title-copy {
+  position: absolute;
+  top: 42px;
+  left: 6%;
+}
+.title-kicker {
+  color: #73866b;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+.title-copy h2 {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  font:
+    900 76px/0.85 "Barlow Condensed",
+    sans-serif;
+  letter-spacing: -1px;
+}
+.title-copy h2 span:first-child {
+  font-size: 35px;
+  letter-spacing: 4px;
+  margin-bottom: 4px;
+}
+.title-copy h2 em {
+  font-size: 87px;
+  font-style: normal;
+  color: var(--coral);
+}
+.title-copy p {
+  color: #6f806b;
+  font-size: 13px;
+  margin: 0 0 19px;
+  font-weight: 600;
+}
+.title-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.title-help {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  border: 1px solid #b8c8aa;
+  border-radius: 10px;
+  background: #fffdf1a0;
+  color: #748869;
+}
+.title-copy small {
+  display: block;
+  font-size: 8px;
+  color: #819279;
+  margin-top: 14px;
+}
+.object-legend {
+  position: absolute;
+  bottom: 31px;
+  right: 5%;
+  display: flex;
+  gap: 9px;
+}
+.object-legend > div {
+  width: 93px;
+  height: 77px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  background: #fffdf3bb;
+  border: 1px solid currentColor;
+  border-radius: 12px;
+}
+.object-legend strong {
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+.object-legend span {
+  font-size: 8px;
+  color: #6e7e6b;
+}
+.legend-hazard {
+  color: #d76350;
+}
+.legend-enemy {
+  color: #38a187;
+}
+.legend-core {
+  color: #c29a28;
+}
+@media (max-width: 480px) {
+  .brand-word {
+    font-size: 13px;
+    letter-spacing: -0.4px;
+  }
+  .title-copy {
+    top: 24px;
+    left: 24px;
+  }
+  .title-kicker {
+    font-size: 6px;
+    letter-spacing: 1px;
+  }
+  .title-copy h2 {
+    font-size: 46px;
+    margin: 12px 0;
+  }
+  .title-copy h2 span:first-child {
+    font-size: 22px;
+    letter-spacing: 2px;
+  }
+  .title-copy h2 em {
+    font-size: 54px;
+  }
+  .title-copy p {
+    font-size: 9px;
+    margin-bottom: 13px;
+  }
+  .title-copy .primary {
+    font-size: 10px;
+    padding: 8px 12px;
+    min-height: 36px;
+    gap: 18px;
+  }
+  .title-help {
+    width: 34px;
+    height: 34px;
+  }
+  .title-help svg {
+    width: 17px;
+  }
+  .title-copy small {
+    font-size: 6px;
+    margin-top: 10px;
+  }
+  .object-legend {
+    left: 16px;
+    right: 16px;
+    bottom: 18px;
+    gap: 7px;
+  }
+  .object-legend > div {
+    width: auto;
+    flex: 1;
+    height: 48px;
+    gap: 2px;
+    border-radius: 7px;
+  }
+  .object-legend svg {
+    width: 16px;
+    height: 16px;
+  }
+  .object-legend strong {
+    font-size: 6px;
+  }
+  .object-legend span {
+    font-size: 6px;
+  }
+  .core-counter strong {
+    font-size: 19px;
+  }
+  .core-counter small {
+    font-size: 8px;
+  }
+  .hud {
+    gap: 12px;
+  }
+}
 .rotation-hint {
   position: absolute;
   top: 106px;
@@ -1800,6 +2022,31 @@ h1 > span:not(.title-star) {
 /* Touch landscape has its own game layout. Desktop and portrait keep the
    landing page and original cards. Safe-area variables are also testable. */
 @media (orientation: landscape) and (max-height: 540px) and (pointer: coarse) {
+  .immersive .title-copy {
+    top: max(32px, calc(var(--safe-top) + 20px));
+    left: max(40px, calc(var(--safe-left) + 12px));
+  }
+  .immersive .title-copy h2 {
+    font-size: 65px;
+    margin: 14px 0;
+  }
+  .immersive .title-copy h2 span:first-child {
+    font-size: 30px;
+  }
+  .immersive .title-copy h2 em {
+    font-size: 77px;
+  }
+  .immersive .title-copy p {
+    font-size: 12px;
+    margin-bottom: 17px;
+  }
+  .immersive .object-legend {
+    right: max(28px, calc(var(--safe-right) + 12px));
+    bottom: calc(var(--safe-bottom) + 31px);
+  }
+  .immersive .hud {
+    gap: 18px;
+  }
   body.game-immersive {
     height: 100dvh;
     overflow: hidden;

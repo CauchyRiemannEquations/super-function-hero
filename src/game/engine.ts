@@ -6,13 +6,23 @@ import {
 } from "./input";
 import { fitViewport, WORLD_HEIGHT } from "./viewport";
 import {
+  attackCanBreak,
+  attackDistance,
+  touchesHazard,
+  makeObject,
+  hasAerialImpact,
+  type WorldObject,
+} from "./objects";
+import { drawObject } from "./render-objects";
+import {
   CHAPTERS,
   DURATION,
   ENCOUNTERS,
   SPEED,
   chapterAt,
   makeEnemy,
-  type Enemy,
+  LOWER_FLOOR,
+  REQUIRED_CORES,
 } from "./stage";
 import {
   FLOOR,
@@ -31,6 +41,8 @@ type Action = {
   elapsed: number;
   hits: number;
   id: number;
+  floor: number;
+  powerful: boolean;
 };
 type Trail = { points: Point[]; color: string; age: number; active: boolean };
 type Particle = Point & {
@@ -68,6 +80,12 @@ export type Snapshot = {
   waveChains: number;
   parabolaCombos: number;
   lastEvent: string;
+  cores: number;
+  gates: number;
+  crashes: number;
+  route: "roof" | "lower";
+  floor: number;
+  failure: string;
 };
 export const INITIAL: Snapshot = {
   phase: "ready",
@@ -90,12 +108,18 @@ export const INITIAL: Snapshot = {
   waveChains: 0,
   parabolaCombos: 0,
   lastEvent: "",
+  cores: 0,
+  gates: 0,
+  crashes: 0,
+  route: "roof",
+  floor: FLOOR,
+  failure: "",
 };
 
 export class Game {
   state: Snapshot = { ...INITIAL };
   player = { x: 180, y: FLOOR, vy: 0, invulnerable: 0 };
-  enemies: Enemy[] = [];
+  objects: WorldObject[] = [];
   trails: Trail[] = [];
   particles: Particle[] = [];
   labels: Label[] = [];
@@ -117,6 +141,15 @@ export class Game {
   spawned = 0;
   id = 0;
   tick = 0;
+  routeStarted = -10;
+  cameraY = 0;
+  crashX = 0;
+  get floor() {
+    if (this.state.route !== "lower") return FLOOR;
+    const age = this.state.time - this.routeStarted;
+    if (age < 4.5) return LOWER_FLOOR;
+    return LOWER_FLOOR - (LOWER_FLOOR - FLOOR) * Math.min(1, (age - 4.5) / 0.8);
+  }
   private frame = 0;
   private previous = 0;
   private accumulator = 0;
@@ -199,6 +232,7 @@ export class Game {
     this.state.y = this.player.y;
     this.state.skill = this.action?.skill ?? null;
     this.state.chapter = CHAPTERS.indexOf(chapterAt(this.state.time));
+    this.state.floor = this.floor;
     this.notify({ ...this.state });
   }
   start() {
@@ -212,7 +246,7 @@ export class Game {
     this.state = { ...INITIAL, phase };
     this.input.clear();
     this.player = { x: 180, y: FLOOR, vy: 0, invulnerable: 0 };
-    this.enemies = [];
+    this.objects = [];
     this.trails = [];
     this.particles = [];
     this.labels = [];
@@ -225,6 +259,9 @@ export class Game {
     this.lastRiseHit = -10;
     this.lastCombo = 0;
     this.accumulator = 0;
+    this.routeStarted = -10;
+    this.cameraY = 0;
+    this.crashX = 0;
     this.emit();
   }
   get anchor() {
@@ -278,10 +315,14 @@ export class Game {
       elapsed: 0,
       hits: 0,
       id: ++this.id,
+      floor: this.floor,
+      powerful:
+        skill === "dive" &&
+        hasAerialImpact(this.floor - this.player.y, this.action),
     };
     this.player.vy = 0;
     this.state.motion =
-      skill === "dive" && this.player.y > FLOOR - 90 ? "hop" : "skill";
+      skill === "dive" && this.player.y > this.floor - 90 ? "hop" : "skill";
     this.trails.push({
       points: [{ x: this.player.x, y: this.player.y }],
       color: SKILLS[skill].color,
@@ -295,12 +336,12 @@ export class Game {
   private endTrail() {
     this.trails.forEach((t) => (t.active = false));
   }
-  spawn(kind: Enemy["kind"] = "bot") {
-    this.enemies.push(
+  spawn(kind: "bot" | "drone" | "spike" = "bot") {
+    this.objects.push(
       makeEnemy(
         ++this.id,
         this.player.x + 270,
-        kind === "drone" ? 180 : FLOOR - 15,
+        kind === "drone" ? this.floor - 168 : this.floor - 15,
         kind,
       ),
     );
@@ -353,17 +394,24 @@ export class Game {
       l.y -= dt * 28;
     });
     this.labels = this.labels.filter((l) => l.life > 0);
-    this.enemies.forEach((e) => {
+    this.objects.forEach((e) => {
       if (e.dead) {
         e.death += dt;
-        e.x += e.vx * dt;
-        e.y += e.vy * dt;
-        e.vy += 400 * dt;
+        if (e.role === "enemy") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.vy += 400 * dt;
+        }
       }
     });
   }
   private update(dt: number) {
     this.state.time += dt;
+    if (
+      this.state.route === "lower" &&
+      this.state.time - this.routeStarted >= 5.3
+    )
+      this.state.route = "roof";
     const buffered = this.input.consume(
       this.state.time,
       this.state.time - this.lastCast >= INPUT_GUARD_SECONDS,
@@ -377,9 +425,15 @@ export class Game {
       this.state.time >= ENCOUNTERS[this.spawned].time
     ) {
       const group = ENCOUNTERS[this.spawned++];
-      group.layout.forEach(([offset, y, kind]) =>
-        this.enemies.push(
-          makeEnemy(++this.id, this.player.x + offset, y, kind),
+      group.layout.forEach((spec) =>
+        this.objects.push(
+          makeObject(
+            ++this.id,
+            spec,
+            this.player.x,
+            this.floor,
+            group.namespace,
+          ),
         ),
       );
     }
@@ -398,7 +452,19 @@ export class Game {
         }
       } else {
         const t = Math.min(1, a.elapsed / SKILLS[a.skill].duration);
-        Object.assign(this.player, trajectory(a.skill, a.start, t));
+        Object.assign(this.player, trajectory(a.skill, a.start, t, a.floor));
+        for (const gate of this.objects)
+          if (
+            gate.kind === "gate" &&
+            touchesHazard(gate, previous, this.player)
+          ) {
+            this.player.x = Math.min(
+              this.player.x,
+              gate.x - gate.width / 2 - 24,
+            );
+            this.hurt(gate);
+          }
+        if (this.state.phase === "over") return;
         if (t >= 1) {
           if (a.skill === "wave" && a.hits > 1) {
             this.state.waveChains++;
@@ -412,56 +478,87 @@ export class Game {
           }
           this.action = null;
           this.endTrail();
-          this.state.motion = this.player.y < FLOOR ? "fall" : "run";
+          this.state.motion = this.player.y < this.floor ? "fall" : "run";
           this.player.vy = a.skill === "rise" ? -65 : 0;
           if (a.skill === "dive") {
             this.shake = this.reduced ? 0 : 6;
-            this.burst(this.player.x, FLOOR + 26, SKILLS.dive.color, 22);
-            this.enemies.forEach((e) => {
+            this.burst(
+              this.player.x,
+              a.floor + 26,
+              SKILLS.dive.color,
+              a.powerful ? 26 : 10,
+            );
+            this.objects.forEach((e) => {
+              if (e.dead || Math.abs(e.floor - a.floor) > 10) return;
               if (
-                !e.dead &&
-                e.kind !== "spike" &&
-                Math.abs(e.x - this.player.x) < 85 &&
-                e.y > FLOOR - 70
+                e.role === "enemy" &&
+                Math.abs(e.x - this.player.x) < (a.powerful ? 85 : 40) &&
+                e.y > a.floor - 70
               )
                 this.hit(e, 0, a);
+              if (
+                e.role === "core" &&
+                e.kind !== "orb" &&
+                Math.abs(e.x - this.player.x) < e.width / 2 + 36 &&
+                attackCanBreak(e, a.skill, a.powerful, true)
+              )
+                this.breakCore(e, a);
             });
           }
         }
       }
-      const trail = this.trails.find((t) => t.active);
-      if (
-        trail &&
-        Math.hypot(this.player.x - previous.x, this.player.y - previous.y) > 1
-      )
-        trail.points.push({ x: this.player.x, y: this.player.y });
     } else {
       this.player.x += SPEED * this.debug.speed * dt;
-      if (this.player.y < FLOOR) {
+      if (this.player.y < this.floor) {
         this.state.motion = "fall";
-        this.player.vy += 1150 * dt;
-        this.player.y = Math.min(FLOOR, this.player.y + this.player.vy * dt);
+        this.player.vy += 480 * dt;
+        this.player.y = Math.min(
+          this.floor,
+          this.player.y + this.player.vy * dt,
+        );
       } else {
+        this.player.y = this.floor;
         this.player.vy = 0;
         this.state.motion = "run";
       }
     }
     this.camera +=
       (this.player.x - this.anchor - this.camera) * (1 - Math.exp(-8 * dt));
-    for (const e of this.enemies) {
+    for (const e of this.objects) {
       if (e.dead || e.passed) continue;
-      const d = segmentDistance(e, previous, this.player);
+      const d = attackDistance(e, previous, this.player);
       const attacking = a && this.state.motion !== "hop";
-      if (e.kind !== "spike" && attacking && d < 52) this.hit(e, d, a);
-      else if (d < (e.kind === "spike" ? 36 : 35)) this.hurt(e);
+      if (
+        attacking &&
+        d < 52 &&
+        attackCanBreak(e, a.skill, a.powerful, false)
+      ) {
+        if (e.role === "enemy") this.hit(e, d, a);
+        else if (e.role === "core") this.breakCore(e, a);
+      }
+      if (e.role === "hazard" && touchesHazard(e, previous, this.player)) {
+        if (e.kind === "gate")
+          this.player.x = Math.min(this.player.x, e.x - e.width / 2 - 24);
+        this.hurt(e);
+      }
       if (!e.dead && e.x < this.player.x - 70) {
-        e.passed = true;
-        if (e.kind !== "spike") this.state.combo = 0;
+        if (e.role !== "core" && e.kind !== "gate") e.passed = true;
+        if (e.role === "enemy") this.state.combo = 0;
       }
     }
-    this.enemies = this.enemies.filter(
-      (e) => e.x > this.camera - 180 && (!e.dead || e.death < 0.55),
+    if (
+      a &&
+      Math.hypot(this.player.x - previous.x, this.player.y - previous.y) > 1
+    )
+      this.trails.at(-1)?.points.push({ x: this.player.x, y: this.player.y });
+    this.objects = this.objects.filter(
+      (e) =>
+        e.x > this.camera - 220 &&
+        (!e.dead || e.death < (e.role === "core" ? 2 : 0.55)),
     );
+    this.cameraY +=
+      (Math.max(0, this.player.y - FLOOR) - this.cameraY) *
+      (1 - Math.exp(-8 * dt));
     if (this.state.combo > 0 && this.state.time - this.lastCombo > 6.5)
       this.state.combo = 0;
     // End-window inputs start on this very simulation step, after the old
@@ -476,15 +573,18 @@ export class Game {
       if (next) this.activate(next);
     }
     if (this.state.time >= DURATION && this.state.phase === "playing") {
-      this.state.phase = "clear";
+      this.state.phase = this.state.cores === REQUIRED_CORES ? "clear" : "over";
+      if (this.state.phase === "over")
+        this.state.failure =
+          "닫힌 CORE가 남았습니다. 문을 열어 코스를 완주하세요.";
       this.input.clear();
       this.state.bufferedSkill = null;
       this.endTrail();
-      this.audio.play("clear");
+      this.audio.play(this.state.phase === "clear" ? "clear" : "hurt");
       this.emit();
     }
   }
-  private hit(e: Enemy, distance: number, action: Action) {
+  private hit(e: WorldObject, distance: number, action: Action) {
     if (e.dead) return;
     e.dead = true;
     e.vx = 220;
@@ -500,7 +600,7 @@ export class Game {
     let precision = distance,
       previous = action.start;
     for (let i = 1; i <= 72; i++) {
-      const next = trajectory(action.skill, action.start, i / 72);
+      const next = trajectory(action.skill, action.start, i / 72, action.floor);
       precision = Math.min(precision, segmentDistance(e, previous, next));
       previous = next;
     }
@@ -531,12 +631,12 @@ export class Game {
     this.burst(e.x, e.y, SKILLS[action.skill].color, 18);
     this.audio.play("hit", this.state.combo % 7);
   }
-  private hurt(e: Enemy) {
+  private hurt(e: WorldObject) {
     if (this.player.invulnerable > 0 || this.debug.invincible) return;
     this.state.hp--;
     this.state.combo = 0;
     this.player.invulnerable = 1.1;
-    e.passed = true;
+    if (e.kind !== "gate") e.passed = true;
     this.shake = this.reduced ? 0 : 9;
     this.hitstop = 0.07;
     this.burst(this.player.x, this.player.y, "#ff694b", 14);
@@ -545,11 +645,59 @@ export class Game {
     this.state.lastEvent = "DAMAGE";
     if (this.state.hp <= 0) {
       this.state.phase = "over";
+      this.state.failure =
+        e.kind === "gate"
+          ? "CORE를 깨지 못해 문에 막혔습니다."
+          : "위험물에 충돌했습니다.";
       this.input.clear();
       this.state.bufferedSkill = null;
       this.endTrail();
       this.emit();
     }
+  }
+  private breakCore(e: WorldObject, action: Action) {
+    if (e.dead) return;
+    e.dead = true;
+    this.state.cores++;
+    this.state.combo++;
+    this.state.maxCombo = Math.max(this.state.maxCombo, this.state.combo);
+    this.lastCombo = this.state.time;
+    this.state.score += 300;
+    action.hits++;
+    if (action.skill === "rise") this.lastRiseHit = this.state.time;
+    if (action.skill === "dive" && this.state.time - this.lastRiseHit < 2.4) {
+      this.state.parabolaCombos++;
+      this.label("PARABOLA COMBO", e.x, e.floor - 105, SKILLS.rise.color, true);
+      this.lastRiseHit = -10;
+    }
+    for (const gate of this.objects)
+      if (gate.kind === "gate" && gate.link === e.link && !gate.open) {
+        gate.open = true;
+        gate.openedAt = this.state.time;
+        this.state.gates++;
+      }
+    if (e.kind !== "fracture")
+      this.label(
+        e.kind === "orb" ? "CORE BREAK" : "AIR IMPACT",
+        e.x,
+        e.kind === "orb" ? Math.max(e.y - 42, this.cameraY + 136) : e.y - 70,
+        "#dca72c",
+        true,
+      );
+    this.burst(e.x, e.y, "#e4b936", 30);
+    this.hitstop = 0.06;
+    this.shake = this.reduced ? 0 : 7;
+    this.audio.play("hit", 6);
+    if (e.kind === "fracture") {
+      this.state.crashes++;
+      this.state.route = "lower";
+      this.routeStarted = this.state.time;
+      this.crashX = e.x;
+      this.player.vy = 240;
+      this.state.motion = "fall";
+      this.label("CRASH! ↓", e.x, e.floor - 30, "#e4a42d", true);
+    }
+    this.state.lastEvent = e.kind === "fracture" ? "CRASH" : "CORE BREAK";
   }
   private burst(x: number, y: number, color: string, count: number) {
     for (let i = 0; i < count; i++) {
@@ -606,6 +754,7 @@ export class Game {
         (Math.random() - 0.5) * this.shake,
         (Math.random() - 0.5) * this.shake,
       );
+    c.translate(0, -this.cameraY);
     this.background();
     const ready = this.state.phase === "ready";
     if (ready) {
@@ -617,7 +766,7 @@ export class Game {
       this.path(samples, "#a5b7a7", 2, 0.55);
       c.setLineDash([]);
       this.drawEnemy(makeEnemy(0, this.width * 0.57, 195, "drone"), true);
-      this.drawEnemy(makeEnemy(1, this.width * 0.75, FLOOR - 16), true);
+      this.drawEnemy(makeEnemy(1, this.width * 0.87, FLOOR - 16), true);
     }
     for (const t of this.trails) {
       const opacity = Math.max(0, 1 - t.age / 0.85);
@@ -637,7 +786,27 @@ export class Game {
         c.globalAlpha = 1;
       }
     }
-    this.enemies.forEach((e) => this.drawEnemy(e));
+    for (const core of this.objects)
+      if (core.role === "core" && !core.dead && core.link) {
+        for (const gate of this.objects)
+          if (gate.kind === "gate" && gate.link === core.link && !gate.open) {
+            c.strokeStyle = "#d7b85c80";
+            c.lineWidth = 1.5;
+            c.setLineDash([4, 6]);
+            c.beginPath();
+            c.moveTo(core.x - this.camera, core.y);
+            c.lineTo(gate.x - this.camera, core.y);
+            c.lineTo(gate.x - this.camera, gate.y);
+            c.stroke();
+            c.setLineDash([]);
+          }
+      }
+    this.objects.forEach((e) => {
+      if (e.x - this.camera < -160 || e.x - this.camera > this.width + 200)
+        return;
+      if (e.role === "enemy") this.drawEnemy(e);
+      else drawObject(c, e, this.camera, this.tick, this.state.time);
+    });
     this.particles.forEach((p) => {
       c.globalAlpha = p.life / p.max;
       c.fillStyle = p.color;
@@ -666,9 +835,14 @@ export class Game {
     });
     if (this.state.phase === "playing") {
       // Screen-edge warnings are positions, not quiz-like skill suggestions.
-      for (const e of this.enemies)
+      for (const e of this.objects)
         if (!e.dead && !e.passed && e.x - this.camera > w - 35) {
-          c.fillStyle = e.kind === "spike" ? "#ff704e" : "#394d58";
+          c.fillStyle =
+            e.role === "hazard"
+              ? "#de584c"
+              : e.role === "core"
+                ? "#d8a129"
+                : "#39ad94";
           c.beginPath();
           c.moveTo(w - 26, e.y - 7);
           c.lineTo(w - 14, e.y);
@@ -682,7 +856,7 @@ export class Game {
       c.beginPath();
       c.arc(this.player.x - this.camera, this.player.y, 30, 0, Math.PI * 2);
       c.stroke();
-      this.enemies
+      this.objects
         .filter((e) => !e.dead)
         .forEach((e) => {
           c.beginPath();
@@ -699,7 +873,7 @@ export class Game {
     gradient.addColorStop(0, "#edf0e9");
     gradient.addColorStop(1, "#f6efd9");
     c.fillStyle = gradient;
-    c.fillRect(0, 0, w, this.viewHeight);
+    c.fillRect(0, this.cameraY, w, this.viewHeight);
     c.strokeStyle = "#dde3d7";
     c.lineWidth = 1;
     for (let x = 0; x < w; x += 58) {
@@ -767,14 +941,28 @@ export class Game {
       }
     }
     c.fillStyle = "#f4ead1";
-    c.fillRect(0, 376, w, this.viewHeight - 376);
+    const deck = this.floor + 28;
+    c.fillRect(0, deck, w, this.viewHeight + this.cameraY - deck);
     c.fillStyle = "#31484e";
-    c.fillRect(0, 376, w, 7);
+    c.fillRect(0, deck, w, 7);
     c.fillStyle = "#cbd5b8";
-    c.fillRect(0, 384, w, 12);
+    c.fillRect(0, deck + 8, w, 12);
+    if (this.state.route === "lower") {
+      const hole = this.crashX - this.camera;
+      c.fillStyle = "#596659";
+      c.fillRect(0, FLOOR + 28, Math.max(0, hole - 75), 12);
+      c.fillRect(hole + 75, FLOOR + 28, w - hole - 75, 12);
+      c.fillStyle = "#e1ae37";
+      c.font = "700 11px Arial";
+      c.fillText(
+        "LOWER ROUTE → BONUS",
+        Math.max(35, hole - 60),
+        this.floor - 48,
+      );
+    }
     c.strokeStyle = "#dfd4b8";
     c.lineWidth = 1;
-    for (let y = 412; y < this.viewHeight; y += 27) {
+    for (let y = deck + 36; y < this.viewHeight + this.cameraY; y += 27) {
       c.beginPath();
       c.moveTo(0, y);
       c.lineTo(w, y);
@@ -784,20 +972,20 @@ export class Game {
       const x = i * 160 - (this.camera % 160);
       c.strokeStyle = "#e0d5bd";
       c.beginPath();
-      c.moveTo(x, 396);
-      c.lineTo(x - 38, this.viewHeight);
+      c.moveTo(x, deck + 20);
+      c.lineTo(x - 38, this.viewHeight + this.cameraY);
       c.stroke();
       c.fillStyle = "#b3bfa5";
-      c.fillRect(x + 47, 386, 24, 3);
+      c.fillRect(x + 47, deck + 10, 24, 3);
     }
     c.save();
-    c.translate(w - 115, 416);
+    c.translate(w - 115, deck + 40);
     c.fillStyle = "#778879";
     c.font = "600 10px monospace";
     c.fillText("ROOFTOP / 01", 0, 0);
     c.restore();
   }
-  private drawEnemy(e: Enemy, preview = false) {
+  private drawEnemy(e: WorldObject, preview = false) {
     const c = this.ctx,
       x = e.x - this.camera,
       y = e.y;
@@ -825,7 +1013,7 @@ export class Game {
       if (!e.dead) {
         c.fillStyle = "#324b4a15";
         c.beginPath();
-        c.ellipse(0, FLOOR + 25 - y, 22, 5, 0, 0, Math.PI * 2);
+        c.ellipse(0, e.floor + 25 - y, 22, 5, 0, 0, Math.PI * 2);
         c.fill();
       }
       if (e.kind === "drone") {
@@ -899,7 +1087,7 @@ export class Game {
         c.fill();
       }
       if (!e.dead && !preview) {
-        c.strokeStyle = "#ff806580";
+        c.strokeStyle = "#39ad9460";
         c.lineWidth = 1;
         c.setLineDash([3, 4]);
         c.beginPath();
@@ -913,20 +1101,16 @@ export class Game {
   private drawPlayer() {
     const c = this.ctx,
       p = this.player,
-      x =
-        this.state.phase === "ready"
-          ? this.width < 800
-            ? this.width * 0.86
-            : 85
-          : p.x - this.camera;
+      x = this.state.phase === "ready" ? this.width * 0.74 : p.x - this.camera;
     const active = this.action?.skill,
       color = active ? SKILLS[active].color : "#ff704e";
     c.fillStyle = "#314b4922";
     c.beginPath();
-    c.ellipse(x, FLOOR + 26, 24, 5, 0, 0, Math.PI * 2);
+    c.ellipse(x, this.floor + 26, 24, 5, 0, 0, Math.PI * 2);
     c.fill();
     c.save();
     c.translate(x, p.y);
+    if (this.state.phase === "ready") c.scale(1.7, 1.7);
     if (p.invulnerable > 0 && Math.floor(this.tick * 16) % 2)
       c.globalAlpha = 0.4;
     const run = this.state.motion === "run",

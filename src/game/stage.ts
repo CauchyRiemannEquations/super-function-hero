@@ -1,53 +1,155 @@
 import { FLOOR } from "./trajectory";
-export const DURATION = 38;
+import { makeObject, type SpawnSpec, type WorldObject } from "./objects";
+export const DURATION = 60;
 export const SPEED = 142;
-export type Enemy = {
-  id: number;
-  x: number;
-  y: number;
-  kind: "bot" | "drone" | "spike";
-  dead: boolean;
-  passed: boolean;
-  death: number;
-  vx: number;
-  vy: number;
-};
+export const LOWER_FLOOR = FLOOR + 100;
+export type Enemy = WorldObject;
+const enemy = (
+  offset: number,
+  above = 18,
+  kind: "bot" | "drone" = "bot",
+): SpawnSpec => ({ role: "enemy", kind, offset, above });
+const core = (
+  offset: number,
+  above: number,
+  link: string,
+  kind: "orb" | "impact" | "fracture" = "orb",
+): SpawnSpec => ({ role: "core", kind, offset, above, link });
+const gate = (offset: number, link: string): SpawnSpec => ({
+  role: "hazard",
+  kind: "gate",
+  offset,
+  link,
+});
+const spike = (offset: number): SpawnSpec => ({
+  role: "hazard",
+  kind: "spike",
+  offset,
+});
+const ceiling = (offset: number): SpawnSpec => ({
+  role: "hazard",
+  kind: "ceiling",
+  offset,
+});
+const wave = [
+  enemy(185, 18),
+  enemy(290, 168, "drone"),
+  enemy(430, 32),
+  enemy(540, 155, "drone"),
+];
+
+// Authored, named chunks. No random generation or function-answer checks.
+// Every invocation gets its own link namespace and local ground reference.
+export const PATTERNS = {
+  DASH_GATE: {
+    name: "첫 번째 잠금",
+    events: [
+      {
+        at: 0,
+        objects: [
+          enemy(300),
+          core(360, 28, "dash"),
+          gate(550, "dash"),
+          spike(830),
+        ],
+      },
+    ],
+  },
+  UPPER_DIVE: {
+    name: "공중에서 바닥까지",
+    events: [
+      {
+        at: 0,
+        objects: [
+          enemy(330, 155, "drone"),
+          core(350, 172, "air"),
+          ceiling(625),
+          core(502, 0, "plate", "impact"),
+          gate(690, "air"),
+          gate(865, "plate"),
+        ],
+      },
+    ],
+  },
+  CRASH_ROUTE: {
+    name: "아래로 길을 내라",
+    events: [
+      {
+        at: 0,
+        objects: [
+          core(350, 172, "air"),
+          ceiling(625),
+          core(502, 0, "crash", "fracture"),
+          gate(690, "air"),
+          gate(800, "crash"),
+        ],
+      },
+      { at: 2.6, objects: wave },
+    ],
+  },
+  WAVE_ALLEY: {
+    name: "물결로 잇기",
+    events: [{ at: 0, objects: [...wave, spike(610)] }],
+  },
+  MIXED_GATE: {
+    name: "마지막 봉쇄",
+    events: [
+      {
+        at: 0,
+        objects: [
+          enemy(200),
+          core(350, 160, "final-air"),
+          core(670, 0, "final-impact", "impact"),
+          gate(840, "final-air"),
+          gate(980, "final-impact"),
+        ],
+      },
+    ],
+  },
+} satisfies Record<
+  string,
+  { name: string; events: { at: number; objects: SpawnSpec[] }[] }
+>;
+export type PatternId = keyof typeof PATTERNS;
+export const COURSE: { time: number; pattern: PatternId }[] = [
+  { time: 1, pattern: "DASH_GATE" },
+  { time: 8, pattern: "UPPER_DIVE" },
+  { time: 16, pattern: "CRASH_ROUTE" },
+  { time: 24, pattern: "WAVE_ALLEY" },
+  { time: 32, pattern: "UPPER_DIVE" },
+  { time: 40, pattern: "CRASH_ROUTE" },
+  { time: 48, pattern: "MIXED_GATE" },
+  { time: 54, pattern: "WAVE_ALLEY" },
+];
+export const ENCOUNTERS = COURSE.flatMap((chunk, index) =>
+  PATTERNS[chunk.pattern].events.map((event) => ({
+    time: chunk.time + event.at,
+    pattern: chunk.pattern,
+    namespace: `${index}-${chunk.pattern}`,
+    layout: event.objects,
+  })),
+).sort((a, b) => a.time - b.time);
+export const REQUIRED_CORES = ENCOUNTERS.reduce(
+  (n, e) => n + e.layout.filter((o) => o.role === "core").length,
+  0,
+);
 export const CHAPTERS = [
   {
     time: 0,
-    name: "옥상에 오신 걸 환영합니다",
-    tip: "앞을 보세요. 곡선이 당신의 움직임이 됩니다.",
+    name: "SKYLINE BREACH",
+    tip: "위험물은 피하고, CORE로 문을 열어라.",
   },
-  {
-    time: 3,
-    name: "직선으로 돌파",
-    tip: "가까워지는 적을 빠르게 관통해 보세요.",
-  },
-  {
-    time: 8,
-    name: "하늘까지, 어퍼컷",
-    tip: "높이 떠 있는 적을 향해 치솟으세요.",
-  },
-  {
-    time: 12,
-    name: "강하게 내려찍기",
-    tip: "도약 후 내려찍기 · 공중에서는 즉시 낙하",
-  },
+  { time: 8, name: "AIR → IMPACT", tip: "공중 CORE를 깨고, 빠르게 아래로." },
   {
     time: 16,
-    name: "리듬을 타는 웨이브",
-    tip: "높이가 다른 적들을 하나의 물결로 연결하세요.",
+    name: "BREAK THE FLOOR",
+    tip: "공중 급강하로 금 간 바닥을 부숴라.",
   },
-  {
-    time: 22,
-    name: "올라갔다, 내려꽂기",
-    tip: "어퍼컷 → 내려찍기. 공중에서 기술을 연결하세요.",
-  },
-  {
-    time: 29,
-    name: "마지막 러시",
-    tip: "네 가지 곡선으로 나만의 콤보를 만드세요.",
-  },
+  { time: 24, name: "WAVE ALLEY", tip: "보너스 적을 하나의 물결로 연결." },
+  { time: 32, name: "SECOND LOCK", tip: "천장을 피하고 충격판을 내려찍어라." },
+  { time: 40, name: "LOWER ROUTE", tip: "아래 루트의 보너스를 노려라." },
+  { time: 48, name: "FINAL BREACH", tip: "마지막 CORE까지 연결하라." },
+  { time: 54, name: "HOME STRETCH", tip: "끝까지 흐름을 이어라." },
 ];
 export function chapterAt(time: number) {
   return [...CHAPTERS].reverse().find((c) => time >= c.time) ?? CHAPTERS[0];
@@ -56,72 +158,15 @@ export function makeEnemy(
   id: number,
   x: number,
   y: number,
-  kind: Enemy["kind"] = "bot",
-): Enemy {
-  return { id, x, y, kind, dead: false, passed: false, death: 0, vx: 0, vy: 0 };
+  kind: "bot" | "drone" | "spike" = "bot",
+): WorldObject {
+  const o = makeObject(
+    id,
+    { role: kind === "spike" ? "hazard" : "enemy", kind, offset: 0 },
+    x,
+    FLOOR,
+    "debug",
+  );
+  o.y = y;
+  return o;
 }
-// Each group is placed relative to the runner at its cue time. Dashes do
-// not accidentally consume the entire stage, and every group gets a telegraph.
-export const ENCOUNTERS = [
-  { time: 2, layout: [[370, FLOOR - 16, "bot"]] },
-  {
-    time: 6.8,
-    layout: [
-      [360, 176, "drone"],
-      [420, 125, "drone"],
-    ],
-  },
-  {
-    time: 11,
-    layout: [
-      [340, FLOOR - 22, "bot"],
-      [400, FLOOR - 22, "bot"],
-    ],
-  },
-  {
-    time: 15.2,
-    layout: [
-      [295, 216, "drone"],
-      [450, 302, "bot"],
-      [560, 184, "drone"],
-    ],
-  },
-  {
-    time: 20.6,
-    layout: [
-      [350, 170, "drone"],
-      [425, 125, "drone"],
-      [610, FLOOR - 20, "bot"],
-      [675, FLOOR - 20, "bot"],
-    ],
-  },
-  {
-    time: 26.8,
-    layout: [
-      [330, FLOOR - 18, "bot"],
-      [560, FLOOR + 8, "spike"],
-      [650, 190, "drone"],
-    ],
-  },
-  {
-    // An opening low target supports dash → wave or dash → uppercut.
-    // The mixed cluster can also be crossed by one wave, without a skill gate.
-    time: 30,
-    layout: [
-      [285, FLOOR - 18, "bot"],
-      [430, 220, "drone"],
-      [575, 302, "bot"],
-      [680, 184, "drone"],
-    ],
-  },
-  {
-    // A second short beat at 34s keeps action near the finish. High + low
-    // pairs allow uppercut → dive, or a timed wave followed by a dash.
-    time: 34,
-    layout: [
-      [315, 176, "drone"],
-      [600, FLOOR - 22, "bot"],
-      [665, FLOOR - 22, "bot"],
-    ],
-  },
-] as const;

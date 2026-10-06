@@ -1,22 +1,38 @@
-# Super Function Hero
+# Super Function Hero · v0.2
 
-**수학 함수 그래프가 캐릭터의 액션 기술이 되는 2D 횡스크롤 웹게임.**
+**함수 그래프가 이동과 공격이 되는 모바일 가로 액션게임.** 문제나 정답 선택 없이, 실제 곡선으로 돌파합니다.
 
-문제를 풀고 정답을 고르는 대신, 함수를 누르면 캐릭터가 그 곡선을 따라 움직이며 적을 공격하고 장애물을 피합니다. 목표는 네 가지 기술의 입력 반응성, 궤적, 타격감, 콤보가 실제로 재미있는지 확인하는 작은 MVP입니다.
+![같은 가로 프레임의 타이틀](docs/images/v02-landscape-title.png)
 
-현재 플레이 화면에는 첫 프로토타입의 임시 이름 **CURVE RUN**이 표시됩니다. 프로젝트 이름은 **Super Function Hero**입니다.
+## 이번 버전
 
-![실제 웨이브 액션과 콤보](docs/images/desktop-action.png)
+- 타이틀·가이드·플레이·결과를 같은 모바일 가로 프레임 안에 배치했습니다. 이름은 Super Function Hero로 통일했습니다.
+- 기존 네 기술, 80px 좌우 2+2 터치 HUD, 그래프 잔상, hit stop, 화면 흔들림, PERFECT·콤보를 유지합니다.
+- **60초짜리 연속 코스**: 중간 메뉴 없이 잠금 해제 → 공중 급강하 → 바닥 파괴 → 아래 루트 → 물결 연속 타격 → 최종 봉쇄로 이어집니다.
+- 오브젝트는 **HAZARD / ENEMY / CORE** 세 역할입니다. 붉은 위험물, 녹색·보라색 보너스 로봇, 금색 CORE와 연결된 문으로 차별화했습니다.
 
-## 바로 실행
+| 역할   | 게임 규칙                                                            |
+| ------ | -------------------------------------------------------------------- |
+| HAZARD | 파괴 불가. 가시·천장은 충돌 시 HP 감소. 닫힌 Gate는 실제 전진을 막음 |
+| ENEMY  | 타격하면 점수·콤보. 놓쳐도 HP 손실 없이 진행 가능                    |
+| CORE   | 궤적으로 부수면 연결된 Gate가 열림. 모든 11개를 열어야 완주          |
 
-### 설치 없이
+일반 CORE는 실제 공격 궤적에 맞아야 합니다. **IMPACT CORE와 CRASH CORE는 공중에서 시작한 급강하의 착지**로만 활성화됩니다. 지상에서 자동 도약하는 약한 급강하는 적 공격용이며, 연타해도 강한 충격으로 바뀌지 않습니다. 금 간 바닥을 깨면 실제로 100 게임 단위 아래로 내려가 보너스 웨이브를 만나고, 경사로로 복귀합니다.
 
-[`artifacts/PLAY-SUPER-FUNCTION-HERO.html`](artifacts/PLAY-SUPER-FUNCTION-HERO.html)을 내려받아 브라우저에서 엽니다. GitHub의 파일 화면에서 **Download raw file**로 저장하세요. GitHub의 코드 보기 화면 자체는 게임을 실행하지 않습니다.
+## 기술과 조작
 
-게임은 클라이언트에서 실행됩니다. 효과음은 시작 버튼을 누른 뒤 활성화됩니다. 외부 Google Fonts가 로드되지 않아도 기본 폰트로 플레이할 수 있습니다.
+| 키  | 기술      | 역할                                       |
+| --- | --------- | ------------------------------------------ |
+| 1   | y = x     | 직선 대시, 앞의 적과 낮은 CORE 관통        |
+| 2   | y = x²    | 공중의 적·CORE로 상승                      |
+| 3   | y = −x²   | 짧고 빠른 하강, 천장 회피·충격판·바닥 파괴 |
+| 4   | y = sin x | 1.5주기 물결, 높이가 다른 적 연속 타격     |
 
-### 개발 서버
+왼쪽 엄지 **x / sin x**, 오른쪽 엄지 **x² / −x²**. Enter 시작, Space/Esc 일시정지, R 즉시 재시작. 마지막 입력 하나를 140ms 기억하여 빠른 연계와 기술 종료 직전 입력을 받아 줍니다.
+
+HP 3칸. 적 처치 100점, PERFECT +50 및 콤보 보너스. CORE 파괴 300점. 적을 놓치면 콤보가 끊기지만 HP가 감소하지 않습니다. 닫힌 문에서 계속 막히면 HP가 줄어 실패합니다.
+
+## 실행
 
 Node.js 22.12+ 또는 24:
 
@@ -27,85 +43,38 @@ npm ci
 npm run dev
 ```
 
-터미널에 표시된 주소를 브라우저에서 엽니다. 기본 주소는 `http://localhost:5173/`입니다. 같은 Wi-Fi의 휴대폰에서는 Network 주소를 사용할 수 있습니다.
+설치 없이 [`artifacts/PLAY-SUPER-FUNCTION-HERO.html`](artifacts/PLAY-SUPER-FUNCTION-HERO.html)을 Download raw file로 저장한 뒤 브라우저에서 열 수 있습니다. 효과음은 시작 이후 활성화됩니다.
 
 ```sh
-npm test                 # 궤적·충돌 테스트
-npm run build            # 프로덕션 빌드
-npm run preview          # 프로덕션 미리보기
-npm run standalone       # artifacts/의 단일 HTML 재생성
+npm test
+npm run build
+npm run preview
+npm run standalone
 ```
 
-## 네 가지 액션
+## 구조
 
-| 키 / 터치 버튼 | 함수 | 움직임 |
-|---|---|---|
-| 1 | `y = x` | 직선 대시 · 앞의 적 관통 |
-| 2 | `y = x²` | 포물선 어퍼컷 · 공중으로 치솟기 |
-| 3 | `y = −x²` | 포물선 내려찍기 · 공중에서 낙하, 지상에서는 도약 후 낙하 |
-| 4 | `y = sin x` | 1.5주기 물결 이동 · 높이가 다른 적 연속 타격 |
+React·TypeScript·Vite·Canvas. 120Hz 고정 스텝과 이동 구간 충돌을 사용합니다.
 
-자동 달리기, HP 3칸, 38초 미션 하나를 구현했습니다. Enter로 시작, Space/Esc로 일시정지, R로 즉시 재시작합니다. 공중에서 다른 기술로 연결할 수 있습니다. 적이 실제 궤적과 공격 범위에 닿는지로 판정하며 정답 함수 검사는 없습니다.
+- `App.tsx`, `TitleScreen.tsx`, `MobileSkills.tsx`: 동일 크기 타이틀과 게임 HUD.
+- `objects.ts`: 세 역할, CORE 활성화, 단단한 위험물의 구간 충돌.
+- `stage.ts`: 직접 설계한 패턴 블록과 60초 코스. 랜덤 생성 없음.
+- `engine.ts`: 전투·Gate·공중 충격·아래 루트·수직 카메라.
+- `render-objects.ts`: 역할별 외형과 문 열림 연출.
+- `trajectory.ts`: 실제 네 함수 이동. 급강하는 전진 120 / 0.34초, 일반 낙하는 더 느림.
+- `input.ts`, `viewport.ts`: 단일 입력 버퍼, DPR·safe-area·균일 배율.
 
-그래프 잔상, 화면 흔들림, hit stop, knockback, 파티클, 효과음, 콤보 확대, PERFECT, WAVE HIT, PARABOLA COMBO가 적용되어 있습니다. 로그인·서버·랭킹·상점은 없습니다.
+## 검증과 다음 단계
 
-## 현재 검증 결과
+단위 테스트 **14개**, 브라우저 검증 **34개 항목**이 통과했습니다. 실제 60초 키 입력으로 **HP 3 / CORE 11 / 열린 Gate 11 / 바닥 파괴 2회 / 적 20회 타격**을 확인했습니다. 모바일에서는 전반부를 고정 스텝으로 재현한 뒤 상승→급강하→붕괴→아래 루트 웨이브를 실제 터치로 검증했습니다. 콘솔 오류는 없었습니다.
 
-- 궤적·충돌·입력 버퍼·균일 배율 테스트 **8개**, 브라우저 검증 **54개 항목** 통과.
-- 실제 38초 키 입력, 무적 없이 HP 3칸 유지 클리어: **타격 21회 / 최대 21콤보 / PERFECT 15회 / 6,398점**.
-- 네 함수의 다른 움직임, 웨이브 다중 타격, 상승→하강 연계, 충돌·실패·재시작 확인.
-- 390×844 세로, 844×390 및 740×360 가로의 터치·버튼·DPR·스크롤·회전 확인. 좌우 44px/하단 21px safe-area를 시뮬레이션해 시야 보호 확인.
-- 마지막 8초에서 대시→웨이브 경로와 웨이브 우선 경로 모두 실제 터치로 HP 3칸, 타격 21회 클리어. 전반부는 고정 스텝으로 재현한 뒤 마지막 구간을 실제 시간으로 플레이했습니다.
-- Chromium 터치 에뮬레이션 119프레임의 중앙값 16.7ms, 95백분위 16.8ms(약 60fps).
-- 최종 콘솔 오류·경고 없음. 단일 HTML 직접 실행과 배포본의 개발 도구 제거 확인.
+타이틀/플레이 프레임과 Canvas 배율이 같으며 844×390·740×360 가로, 390×844 세로를 확인했습니다. 별도 Chromium 터치 에뮬레이션의 120프레임 중앙값은 16.7ms, 95백분위는 16.8ms였습니다. [검증 결과](docs/verification-v02.json)와 [아래 루트](docs/images/v02-landscape-crash.png), [웨이브](docs/images/v02-landscape-wave.png), [클리어](docs/images/v02-desktop-clear.png) 캡처를 참고하세요.
 
-모바일은 Chromium 터치 에뮬레이션으로 확인했습니다. 검증용 브라우저가 네이티브 fullscreen을 `not granted`로 거절하므로 전체 화면 이벤트의 UI 전환은 시뮬레이션으로 검사했고, API 거절 후 진행과 orientation lock 거절도 확인했습니다. 실제 iOS/Android의 주소창·노치·성능·오디오·네이티브 fullscreen/lock·손맛은 아직 검증하지 않았습니다. 수치 검증은 재미 검증을 대체하지 않으며, 플레이어 관찰이 다음 단계입니다.
+실제 iOS/Android의 손가락 가림·주소창·노치·오디오·성능과 네이티브 fullscreen/방향 잠금은 별도 기기 확인이 필요합니다. 에뮬레이션 결과를 실제 기기 성능이나 재미 평가로 해석하지 마세요.
 
-## 최근 플레이 피드백과 다음 방향
+다음은 **v0.3 Continuous Run**입니다. 이번 버전의 60초 코스와 패턴 라이브러리를 검증한 후 2~3분, 3~4개 환경, 완만한 속도 상승으로 확장합니다. 새 함수·계수·Endless·랭킹은 아직 추가하지 않았습니다.
 
-> “재밌는데 모바일 가로 환경으로… 저 직선 무브 버튼을 인게임 내에 넣으면 좋을 듯?”
-
-이 피드백을 바탕으로 **모바일 가로 몰입 모드와 좌우 2+2 인게임 버튼**을 구현했습니다. 낮은 높이의 터치 가로 화면에서 시작하면 랜딩 UI를 숨기고 `100dvw × 100dvh` 게임 화면으로 전환합니다. 세로 모드와 데스크톱은 기존 랜딩 디자인과 카드 버튼을 유지합니다.
-
-- 왼쪽 엄지: **직선 대시 `x` / 사인 웨이브 `sin x`**.
-- 오른쪽 엄지: **어퍼컷 `x²` / 내려찍기 `−x²`**.
-- 80×80px 터치 영역, 반투명 그래프 버튼, 즉시 눌림·발광과 예약 입력 표시.
-- 노치·홈 영역의 safe-area 여백, 페이지 스크롤 없는 플레이, 나가기 버튼.
-- 손가락 영역 위로 지상 전투를 배치하고 배경은 화면 끝까지 이어집니다. 물리·충돌 좌표는 유지합니다.
-- 140ms 동안 마지막 입력 하나만 기억합니다. 120ms 제한에 걸린 입력은 첫 가능 프레임에, 기술 종료 직전 입력은 마지막 타격 후 연결합니다. pause·restart·결과·나가기에서는 예약을 지웁니다.
-- 마지막 러시는 30초의 혼합 4마리와 34초의 공중/지상 3마리로 나눴습니다. 총 길이는 38초이며 전반부는 그대로입니다.
-- Fullscreen/landscape lock은 지원되는 경우만 시도합니다. 거절되거나 없어도 CSS 몰입 모드에서 계속 플레이합니다.
-
-![모바일 가로 인게임 HUD](docs/images/mobile-landscape-v2.png)
-
-## GPT와 이어서 이야기할 자료
-
-- [CHATGPT_BRIEF.md](docs/CHATGPT_BRIEF.md): 현재 상태와 다음 논의 사항을 한 번에 읽는 요약, 복사해서 사용할 질문.
-- [GAME_DESIGN.md](docs/GAME_DESIGN.md): 원래 기획의 핵심 요구사항과 14개 범위.
-- [NEXT_STEPS.md](docs/NEXT_STEPS.md): 구현된 모바일 가로 UX와 실제 기기에서 확인할 사항.
-- [IMPLEMENTATION.md](docs/IMPLEMENTATION.md): 실행, 수치, 파일 구조, 개발 도구와 구현 설명.
-- [verification.json](docs/verification.json): 검증 결과 요약.
-- [verification-mobile.json](docs/verification-mobile.json): 이번 가로 UI의 54개 검증 항목, 결과와 에뮬레이션 성능.
-- [데스크톱 클리어 화면](docs/images/desktop-clear.png), [모바일 초기 화면](docs/images/mobile-ready.png).
-
-## 코드 구조
-
-```text
-src/App.tsx               HUD, 스킬 버튼, 가이드, 결과, 개발 도구
-src/style.css             반응형 화면 스타일
-src/components/MobileSkills.tsx  모바일 좌우 2+2 HUD
-src/components/SkillGraph.tsx    데스크톱과 모바일 공용 그래프 아이콘
-src/game/engine.ts        게임 상태, 120Hz 업데이트, 충돌, 카메라, 렌더링
-src/game/trajectory.ts    정규화한 함수 이동, 구간 충돌 거리
-src/game/stage.ts         미션의 구간과 적·장애물 배치
-src/game/audio.ts         Web Audio 효과음
-src/game/trajectory.test.ts
-src/game/input.ts         마지막 입력 하나를 140ms 기억하는 버퍼
-src/game/viewport.ts      손가락 영역을 보호하는 균일 배율
-src/game/browser-mode.ts  선택적 fullscreen/orientation API
-scripts/standalone.mjs    설치 없는 HTML 생성
-artifacts/                단일 HTML 실행본
-docs/                     기획, 논의 요약, 검증과 캡처
-```
-
-React + TypeScript + Vite + HTML Canvas를 사용합니다. 게임 좌표는 React UI 상태 갱신과 분리되어 있고, `requestAnimationFrame` 및 고정 시간 스텝으로 이동합니다.
+- [전체 로드맵](docs/ROADMAP.md)
+- [현재 구현과 다음 확인](docs/NEXT_STEPS.md)
+- [구현 상세](docs/IMPLEMENTATION.md)
+- [GPT 논의용 요약](docs/CHATGPT_BRIEF.md)

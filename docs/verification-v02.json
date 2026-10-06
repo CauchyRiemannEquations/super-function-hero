@@ -1,0 +1,599 @@
+{
+  "checks": [
+    {
+      "name": "Name is Super Function Hero throughout live UI",
+      "passed": true
+    },
+    {
+      "name": "ENEMY can be missed without HP loss",
+      "passed": true,
+      "evidence": {
+        "hp": 3,
+        "kills": 0,
+        "passed": true
+      }
+    },
+    {
+      "name": "HAZARD survives an attack and damages player",
+      "passed": true,
+      "evidence": {
+        "hp": 2,
+        "dead": false,
+        "kills": 0
+      }
+    },
+    {
+      "name": "Orb CORE opens its linked solid Gate on path hit",
+      "passed": true,
+      "evidence": {
+        "cores": 1,
+        "gates": 1,
+        "hp": 3,
+        "open": true
+      }
+    },
+    {
+      "name": "Ground hop dive cannot trigger impact CORE",
+      "passed": true,
+      "evidence": {
+        "cores": 0,
+        "dead": false
+      }
+    },
+    {
+      "name": "Genuine aerial dive triggers impact CORE",
+      "passed": true,
+      "evidence": {
+        "cores": 1,
+        "dead": true
+      }
+    },
+    {
+      "name": "Cracked floor causes real descent to lower route",
+      "passed": true,
+      "evidence": {
+        "cores": 1,
+        "route": "lower",
+        "floor": 448,
+        "y": 448,
+        "crashes": 1
+      }
+    },
+    {
+      "name": "Timer cannot award Clear with missing COREs",
+      "passed": true,
+      "evidence": {
+        "phase": "over",
+        "reason": "닫힌 CORE가 남았습니다. 문을 열어 코스를 완주하세요."
+      }
+    },
+    {
+      "name": "Enter starts",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 1 works",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 2 works",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 3 works",
+      "passed": true
+    },
+    {
+      "name": "Keyboard 4 works",
+      "passed": true
+    },
+    {
+      "name": "Space pauses",
+      "passed": true
+    },
+    {
+      "name": "Esc resumes",
+      "passed": true
+    },
+    {
+      "name": "Closed Gate blocks and kills no-input run",
+      "passed": true,
+      "evidence": {
+        "phase": "over",
+        "hp": 0,
+        "score": 0,
+        "combo": 0,
+        "maxCombo": 0,
+        "kills": 0,
+        "perfects": 0,
+        "time": 6.800000000000128,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 0,
+        "fps": 30.011039273712328,
+        "x": 826.0000000000005,
+        "y": 348,
+        "motion": "run",
+        "casts": 0,
+        "hits": 0,
+        "waveChains": 0,
+        "parabolaCombos": 0,
+        "lastEvent": "DAMAGE",
+        "cores": 0,
+        "gates": 0,
+        "crashes": 0,
+        "route": "roof",
+        "floor": 348,
+        "failure": "CORE를 깨지 못해 문에 막혔습니다."
+      }
+    },
+    {
+      "name": "Actual 60s keyboard run clears all 11 COREs with HP3",
+      "passed": true,
+      "evidence": {
+        "phase": "clear",
+        "hp": 3,
+        "score": 8687,
+        "combo": 13,
+        "maxCombo": 13,
+        "kills": 20,
+        "perfects": 20,
+        "time": 60.00833333333057,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 7,
+        "fps": 29.99521435232634,
+        "x": 11534.383333332222,
+        "y": 348,
+        "motion": "run",
+        "casts": 16,
+        "hits": 20,
+        "waveChains": 5,
+        "parabolaCombos": 4,
+        "lastEvent": "PERFECT",
+        "cores": 11,
+        "gates": 11,
+        "crashes": 2,
+        "route": "roof",
+        "floor": 348,
+        "failure": ""
+      }
+    },
+    {
+      "name": "Dive and lower route have functional roles",
+      "passed": true,
+      "evidence": {
+        "phase": "clear",
+        "hp": 3,
+        "score": 8687,
+        "combo": 13,
+        "maxCombo": 13,
+        "kills": 20,
+        "perfects": 20,
+        "time": 60.00833333333057,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 7,
+        "fps": 29.99521435232634,
+        "x": 11534.383333332222,
+        "y": 348,
+        "motion": "run",
+        "casts": 16,
+        "hits": 20,
+        "waveChains": 5,
+        "parabolaCombos": 4,
+        "lastEvent": "PERFECT",
+        "cores": 11,
+        "gates": 11,
+        "crashes": 2,
+        "route": "roof",
+        "floor": 348,
+        "failure": ""
+      }
+    },
+    {
+      "name": "Restart clears CORE/Gate/route and HP",
+      "passed": true
+    },
+    {
+      "name": "Landscape title already fills the same game frame",
+      "passed": true,
+      "evidence": {
+        "frame": [
+          0,
+          0,
+          844,
+          390
+        ],
+        "bitmap": [
+          1688,
+          780
+        ],
+        "world": [
+          1416.934306569343,
+          654.7445255474453
+        ],
+        "scroll": [
+          844,
+          390
+        ],
+        "buttons": [
+          {
+            "x": 16,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 96,
+            "bottom": 378,
+            "left": 16
+          },
+          {
+            "x": 106,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 186,
+            "bottom": 378,
+            "left": 106
+          },
+          {
+            "x": 658,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 738,
+            "bottom": 378,
+            "left": 658
+          },
+          {
+            "x": 748,
+            "y": 298,
+            "width": 80,
+            "height": 80,
+            "top": 298,
+            "right": 828,
+            "bottom": 378,
+            "left": 748
+          }
+        ]
+      }
+    },
+    {
+      "name": "Start does not resize title/canvas/frame",
+      "passed": true,
+      "evidence": {
+        "ready": {
+          "frame": [
+            0,
+            0,
+            844,
+            390
+          ],
+          "bitmap": [
+            1688,
+            780
+          ],
+          "world": [
+            1416.934306569343,
+            654.7445255474453
+          ],
+          "scroll": [
+            844,
+            390
+          ],
+          "buttons": [
+            {
+              "x": 16,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 96,
+              "bottom": 378,
+              "left": 16
+            },
+            {
+              "x": 106,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 186,
+              "bottom": 378,
+              "left": 106
+            },
+            {
+              "x": 658,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 738,
+              "bottom": 378,
+              "left": 658
+            },
+            {
+              "x": 748,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 828,
+              "bottom": 378,
+              "left": 748
+            }
+          ]
+        },
+        "playing": {
+          "frame": [
+            0,
+            0,
+            844,
+            390
+          ],
+          "bitmap": [
+            1688,
+            780
+          ],
+          "world": [
+            1416.934306569343,
+            654.7445255474453
+          ],
+          "scroll": [
+            844,
+            390
+          ],
+          "buttons": [
+            {
+              "x": 16,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 96,
+              "bottom": 378,
+              "left": 16
+            },
+            {
+              "x": 106,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 186,
+              "bottom": 378,
+              "left": 106
+            },
+            {
+              "x": 658,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 738,
+              "bottom": 378,
+              "left": 658
+            },
+            {
+              "x": 748,
+              "y": 298,
+              "width": 80,
+              "height": 80,
+              "top": 298,
+              "right": 828,
+              "bottom": 378,
+              "left": 748
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Four in-game touch targets >=64px and uncut",
+      "passed": true
+    },
+    {
+      "name": "Landscape touch line works",
+      "passed": true
+    },
+    {
+      "name": "Landscape touch rise works",
+      "passed": true
+    },
+    {
+      "name": "Landscape touch dive works",
+      "passed": true
+    },
+    {
+      "name": "Landscape touch wave works",
+      "passed": true
+    },
+    {
+      "name": "Touch dive opens CORE and falls into lower route",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 1800,
+        "combo": 2,
+        "maxCombo": 3,
+        "kills": 2,
+        "perfects": 2,
+        "time": 18.358333333332933,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 2,
+        "fps": 59.986805609227844,
+        "x": 3552.616666666748,
+        "y": 448,
+        "motion": "run",
+        "casts": 6,
+        "hits": 2,
+        "waveChains": 0,
+        "parabolaCombos": 2,
+        "lastEvent": "CRASH",
+        "cores": 5,
+        "gates": 5,
+        "crashes": 1,
+        "route": "lower",
+        "floor": 448,
+        "failure": ""
+      }
+    },
+    {
+      "name": "Touch wave gets four optional lower-route enemies",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "hp": 3,
+        "score": 2716,
+        "combo": 6,
+        "maxCombo": 6,
+        "kills": 6,
+        "perfects": 6,
+        "time": 20.966666666666118,
+        "skill": null,
+        "bufferedSkill": null,
+        "chapter": 2,
+        "fps": 60.02921196456038,
+        "x": 4228.633333333427,
+        "y": 284.6,
+        "motion": "fall",
+        "casts": 7,
+        "hits": 6,
+        "waveChains": 1,
+        "parabolaCombos": 2,
+        "lastEvent": "PERFECT",
+        "cores": 5,
+        "gates": 5,
+        "crashes": 1,
+        "route": "lower",
+        "floor": 448,
+        "failure": ""
+      }
+    },
+    {
+      "name": "740×360 game fills viewport and preserves equal scales",
+      "passed": true,
+      "evidence": {
+        "frame": [
+          0,
+          0,
+          740,
+          360
+        ],
+        "bitmap": [
+          1480,
+          720
+        ],
+        "world": [
+          1395.0819672131147,
+          678.6885245901639
+        ],
+        "scroll": [
+          740,
+          360
+        ],
+        "buttons": [
+          {
+            "x": 16,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 96,
+            "bottom": 348,
+            "left": 16
+          },
+          {
+            "x": 106,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 186,
+            "bottom": 348,
+            "left": 106
+          },
+          {
+            "x": 554,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 634,
+            "bottom": 348,
+            "left": 554
+          },
+          {
+            "x": 644,
+            "y": 268,
+            "width": 80,
+            "height": 80,
+            "top": 268,
+            "right": 724,
+            "bottom": 348,
+            "left": 644
+          }
+        ]
+      }
+    },
+    {
+      "name": "740×360 return-to-title does not resize",
+      "passed": true
+    },
+    {
+      "name": "Portrait still has playable title and no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "No console/page errors",
+      "passed": true,
+      "evidence": []
+    },
+    {
+      "name": "Double ground dive cannot bypass impact CORE",
+      "passed": true,
+      "evidence": {
+        "cores": 0,
+        "power": false
+      }
+    },
+    {
+      "name": "Omitting dive after uppercut causes ceiling/closed-gate failure",
+      "passed": true,
+      "evidence": {
+        "phase": "over",
+        "hp": 0,
+        "cores": 2,
+        "hazardHit": true
+      }
+    }
+  ],
+  "errors": [],
+  "emulatedPerformance": {
+    "medianMs": 16.699999999999818,
+    "p95Ms": 16.800000000000182
+  },
+  "standalone": {
+    "passed": true,
+    "result": {
+      "dev": false,
+      "active": "4 y = sin x 사인 웨이브",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 740,
+        "height": 360,
+        "top": 0,
+        "right": 740,
+        "bottom": 360,
+        "left": 0
+      }
+    },
+    "errors": []
+  }
+}
