@@ -1,0 +1,282 @@
+{
+  "generatedAt": "2026-10-07T23:10:59.709Z",
+  "timezone": "Asia/Seoul",
+  "url": "http://localhost:5173",
+  "status": "passed",
+  "mode": "Isolated non-persistent Chromium context; actual UI clicks and keyboard events; read-only dev-hook inspection; real clock; no game state mutation or dispatched lifecycle events",
+  "viewport": {
+    "width": 1100,
+    "height": 740,
+    "deviceScaleFactor": 1,
+    "isMobile": false,
+    "hasTouch": false
+  },
+  "browserVersion": "151.0.7922.34",
+  "checks": [
+    {
+      "name": "Fresh isolated context starts with sound enabled and no reduced-motion override",
+      "passed": true,
+      "evidence": {
+        "phase": "ready",
+        "time": 0,
+        "runTime": 0,
+        "jumps": 0,
+        "misses": 0,
+        "playerX": 80,
+        "audioEnabled": true,
+        "audioContextState": "not-created",
+        "reduced": false,
+        "controlsBlocked": false,
+        "savedSettings": null,
+        "visibility": "visible"
+      }
+    },
+    {
+      "name": "Actual sound and motion switches update engine preferences, saved settings and accessible switch state",
+      "passed": true,
+      "evidence": {
+        "phase": "ready",
+        "time": 0,
+        "runTime": 0,
+        "jumps": 0,
+        "misses": 0,
+        "playerX": 80,
+        "audioEnabled": false,
+        "audioContextState": "not-created",
+        "reduced": true,
+        "controlsBlocked": true,
+        "savedSettings": {
+          "muted": true,
+          "reducedMotion": true
+        },
+        "visibility": "visible"
+      }
+    },
+    {
+      "name": "Muted sound and reduced motion persist after a complete reload",
+      "passed": true,
+      "evidence": {
+        "phase": "ready",
+        "time": 0,
+        "runTime": 0,
+        "jumps": 0,
+        "misses": 0,
+        "playerX": 80,
+        "audioEnabled": false,
+        "audioContextState": "not-created",
+        "reduced": true,
+        "controlsBlocked": false,
+        "savedSettings": {
+          "muted": true,
+          "reducedMotion": true
+        },
+        "visibility": "visible"
+      }
+    },
+    {
+      "name": "Unmuting through a real click unlocks a running Web Audio context; motion override can be turned off",
+      "passed": true,
+      "evidence": {
+        "phase": "ready",
+        "time": 0,
+        "runTime": 0,
+        "jumps": 0,
+        "misses": 0,
+        "playerX": 80,
+        "audioEnabled": true,
+        "audioContextState": "running",
+        "reduced": false,
+        "controlsBlocked": true,
+        "savedSettings": {
+          "muted": false,
+          "reducedMotion": false
+        },
+        "visibility": "visible"
+      }
+    },
+    {
+      "name": "Unmuted sound and full motion persist after a complete reload",
+      "passed": true,
+      "evidence": {
+        "phase": "ready",
+        "time": 0,
+        "runTime": 0,
+        "jumps": 0,
+        "misses": 0,
+        "playerX": 80,
+        "audioEnabled": true,
+        "audioContextState": "not-created",
+        "reduced": false,
+        "controlsBlocked": false,
+        "savedSettings": {
+          "muted": false,
+          "reducedMotion": false
+        },
+        "visibility": "visible"
+      }
+    },
+    {
+      "name": "Starting Stage 1 through menus runs the real simulation, unlocks audio and pauses through the HUD",
+      "passed": true,
+      "evidence": {
+        "phase": "paused",
+        "time": 0.18333333333333332,
+        "runTime": 0.18333333333333332,
+        "jumps": 0,
+        "misses": 0,
+        "playerX": 112.71921782340901,
+        "audioEnabled": true,
+        "audioContextState": "running",
+        "reduced": false,
+        "controlsBlocked": false,
+        "savedSettings": {
+          "muted": false,
+          "reducedMotion": false
+        },
+        "visibility": "visible"
+      }
+    },
+    {
+      "name": "R inside the settings dialog causes no hidden restart, movement or resume",
+      "passed": true,
+      "evidence": {
+        "before": {
+          "phase": "paused",
+          "time": 0.18333333333333332,
+          "runTime": 0.18333333333333332,
+          "jumps": 0,
+          "misses": 0,
+          "playerX": 112.71921782340901,
+          "audioEnabled": true,
+          "audioContextState": "running",
+          "reduced": false,
+          "controlsBlocked": true,
+          "savedSettings": {
+            "muted": false,
+            "reducedMotion": false
+          },
+          "visibility": "visible"
+        },
+        "after": {
+          "phase": "paused",
+          "time": 0.18333333333333332,
+          "runTime": 0.18333333333333332,
+          "jumps": 0,
+          "misses": 0,
+          "playerX": 112.71921782340901,
+          "audioEnabled": true,
+          "audioContextState": "running",
+          "reduced": false,
+          "controlsBlocked": true,
+          "savedSettings": {
+            "muted": false,
+            "reducedMotion": false
+          },
+          "visibility": "visible"
+        }
+      }
+    },
+    {
+      "name": "Esc closes settings and leaves the underlying run paused, without restarting or resuming it",
+      "passed": true,
+      "evidence": {
+        "phase": "paused",
+        "time": 0.18333333333333332,
+        "runTime": 0.18333333333333332,
+        "jumps": 0,
+        "misses": 0,
+        "playerX": 112.71921782340901,
+        "audioEnabled": true,
+        "audioContextState": "running",
+        "reduced": false,
+        "controlsBlocked": false,
+        "savedSettings": {
+          "muted": false,
+          "reducedMotion": false
+        },
+        "visibility": "visible"
+      }
+    },
+    {
+      "name": "Actual resume control returns to the same run with running audio and advancing time",
+      "passed": true,
+      "evidence": {
+        "phase": "playing",
+        "time": 0.3000000000000001,
+        "runTime": 0.3000000000000001,
+        "jumps": 0,
+        "misses": 0,
+        "playerX": 133.6681479435557,
+        "audioEnabled": true,
+        "audioContextState": "running",
+        "reduced": false,
+        "controlsBlocked": false,
+        "savedSettings": {
+          "muted": false,
+          "reducedMotion": false
+        },
+        "visibility": "visible"
+      }
+    },
+    {
+      "name": "No page exceptions or console errors occurred during the isolated settings/audio regression",
+      "passed": true,
+      "evidence": {
+        "pageErrors": [],
+        "consoleErrors": [],
+        "audioMessages": []
+      }
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "audioMessages": [],
+  "limitations": [
+    "Headless Chromium kept the first tab document.visibilityState=visible after a second tab was brought to front. The visibility-triggered pause could not be verified without synthesizing events; no such events were dispatched.",
+    "A running Web Audio context and absence of audio errors are verified. Audible quality, device speakers and physical mobile Safari/Chrome require device testing."
+  ],
+  "visibilityObservation": {
+    "method": "Open and bring a second tab to front; read first tab visibility and game state",
+    "before": {
+      "phase": "playing",
+      "time": 0.3000000000000001,
+      "runTime": 0.3000000000000001,
+      "jumps": 0,
+      "misses": 0,
+      "playerX": 133.6681479435557,
+      "audioEnabled": true,
+      "audioContextState": "running",
+      "reduced": false,
+      "controlsBlocked": false,
+      "savedSettings": {
+        "muted": false,
+        "reducedMotion": false
+      },
+      "visibility": "visible"
+    },
+    "after": {
+      "phase": "playing",
+      "time": 0.5583333333333338,
+      "runTime": 0.6083333333333336,
+      "jumps": 0,
+      "misses": 0,
+      "playerX": 189.50068556163149,
+      "audioEnabled": true,
+      "audioContextState": "running",
+      "reduced": false,
+      "controlsBlocked": false,
+      "savedSettings": {
+        "muted": false,
+        "reducedMotion": false
+      },
+      "visibility": "visible"
+    }
+  },
+  "finishedAt": "2026-10-07T23:11:02.587Z",
+  "inAppBrowserVisibilityObservation": {
+    "visibilityState": "visible",
+    "detail": "A real second in-app browser tab was created during a run; the original document remained visible, so this environment did not exercise visibilitychange auto-pause. No synthetic event or game state mutation was used.",
+    "status": "not_verified",
+    "hidden": false
+  }
+}

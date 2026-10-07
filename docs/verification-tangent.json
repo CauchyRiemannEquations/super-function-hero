@@ -1,0 +1,1156 @@
+{
+  "generatedAt": "2026-10-07T23:04:16.698Z",
+  "url": "http://localhost:5173",
+  "status": "passed",
+  "mode": "Real-time Chromium touch emulation; actual menu taps and canvas taps; read-only dev state inspection; no state mutation or fake clock",
+  "viewport": {
+    "width": 844,
+    "height": 390,
+    "deviceScaleFactor": 2,
+    "isMobile": true,
+    "hasTouch": true
+  },
+  "browserVersion": "151.0.7922.34",
+  "runs": [
+    {
+      "phase": "clear",
+      "stats": {
+        "time": 3.8166666666666558,
+        "coins": 7,
+        "jumps": 1,
+        "perfects": 1,
+        "perfectLandings": 1,
+        "combo": 2,
+        "maxCombo": 2,
+        "misses": 0,
+        "score": 2338,
+        "lastSlope": 0.2519138015500062,
+        "lastJumpX": 396.93791751999
+      },
+      "clock": 3.8166666666666558,
+      "player": {
+        "x": 1001.1680240478597,
+        "y": 110,
+        "vx": 195,
+        "vy": 0,
+        "angle": 0,
+        "surface": "receiver"
+      },
+      "snapshot": {
+        "phase": "clear",
+        "stage": 0,
+        "time": 3.8166666666666558,
+        "coins": 7,
+        "totalCoins": 7,
+        "jumps": 1,
+        "perfects": 1,
+        "perfectLandings": 1,
+        "combo": 2,
+        "maxCombo": 2,
+        "misses": 0,
+        "score": 2338,
+        "bestTime": 3.8166666666666558,
+        "newBest": true,
+        "lastSlope": 0.2519138015500062,
+        "lastJumpX": 396.93791751999,
+        "progress": 0.9905032516643653,
+        "event": ""
+      },
+      "checkpoint": "landing",
+      "tracePoints": 286,
+      "stageIndex": 0,
+      "route": "first landing",
+      "launches": [
+        {
+          "requestedClock": 1.65,
+          "beforeClock": 0.15,
+          "clock": 1.799999999999996,
+          "launchClock": 1.7249999999999963,
+          "x": 396.93791751999,
+          "slope": 0.2519138015500062,
+          "vx": 407.275790840938,
+          "measuredVy": 73.34839275002588,
+          "initialVy": 102.59839275002578,
+          "grounded": false,
+          "jumps": 1,
+          "perfectZones": [
+            {
+              "surface": "rise",
+              "x": 380,
+              "tolerance": 30
+            }
+          ],
+          "withinPerfectZone": true,
+          "pointer": {
+            "button": 0,
+            "isPrimary": true,
+            "pointerType": "touch",
+            "target": "CANVAS",
+            "phase": "playing",
+            "clock": 1.7249999999999963,
+            "controlsBlocked": false
+          },
+          "expectedSign": "positive"
+        }
+      ],
+      "record": {
+        "bestTime": 3.8166666666666558,
+        "bestScore": 2338,
+        "clears": 1
+      },
+      "resultLayout": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "panel": {
+          "x": 557.046875,
+          "y": 0,
+          "right": 844,
+          "bottom": 390,
+          "clientHeight": 390,
+          "scrollHeight": 390
+        },
+        "buttons": [
+          {
+            "text": "다음 스테이지",
+            "x": 576.046875,
+            "y": 283,
+            "right": 828,
+            "bottom": 327,
+            "height": 44
+          },
+          {
+            "text": "다시 달리기",
+            "x": 576.046875,
+            "y": 334,
+            "right": 699.015625,
+            "bottom": 378,
+            "height": 44
+          },
+          {
+            "text": "스테이지",
+            "x": 705.015625,
+            "y": 334,
+            "right": 828,
+            "bottom": 378,
+            "height": 44
+          }
+        ]
+      },
+      "stageId": 1
+    },
+    {
+      "phase": "clear",
+      "stats": {
+        "time": 3.59999999999999,
+        "coins": 6,
+        "jumps": 1,
+        "perfects": 0,
+        "perfectLandings": 1,
+        "combo": 1,
+        "maxCombo": 1,
+        "misses": 0,
+        "score": 1950,
+        "lastSlope": -0.05067359830205079,
+        "lastJumpX": 419.00259936326904
+      },
+      "clock": 3.59999999999999,
+      "player": {
+        "x": 980.9380656364867,
+        "y": 65,
+        "vx": 195,
+        "vy": 0,
+        "angle": 0,
+        "surface": "receiver"
+      },
+      "snapshot": {
+        "phase": "clear",
+        "stage": 1,
+        "time": 3.59999999999999,
+        "coins": 6,
+        "totalCoins": 6,
+        "jumps": 1,
+        "perfects": 0,
+        "perfectLandings": 1,
+        "combo": 1,
+        "maxCombo": 1,
+        "misses": 0,
+        "score": 1950,
+        "bestTime": 3.59999999999999,
+        "newBest": true,
+        "lastSlope": -0.05067359830205079,
+        "lastJumpX": 419.00259936326904,
+        "progress": 0.9895839834902146,
+        "event": ""
+      },
+      "checkpoint": "landing",
+      "tracePoints": 266,
+      "stageIndex": 1,
+      "route": "at the vertex",
+      "launches": [
+        {
+          "requestedClock": 1.6,
+          "beforeClock": 0.2583333333333333,
+          "clock": 1.7583333333333295,
+          "launchClock": 1.6583333333333299,
+          "x": 419.00259936326904,
+          "slope": -0.05067359830205079,
+          "vx": 419.4617954365976,
+          "measuredVy": -60.25563852501115,
+          "initialVy": -21.255638525011292,
+          "grounded": false,
+          "jumps": 1,
+          "perfectZones": [
+            {
+              "surface": "arch",
+              "x": 400,
+              "tolerance": 18
+            }
+          ],
+          "withinPerfectZone": false,
+          "pointer": {
+            "button": 0,
+            "isPrimary": true,
+            "pointerType": "touch",
+            "target": "CANVAS",
+            "phase": "playing",
+            "clock": 1.6583333333333299,
+            "controlsBlocked": false
+          },
+          "expectedSign": "zero"
+        }
+      ],
+      "record": {
+        "bestTime": 3.59999999999999,
+        "bestScore": 1950,
+        "clears": 1
+      },
+      "resultLayout": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "panel": {
+          "x": 557.046875,
+          "y": 0,
+          "right": 844,
+          "bottom": 390,
+          "clientHeight": 390,
+          "scrollHeight": 390
+        },
+        "buttons": [
+          {
+            "text": "다음 스테이지",
+            "x": 576.046875,
+            "y": 283,
+            "right": 828,
+            "bottom": 327,
+            "height": 44
+          },
+          {
+            "text": "다시 달리기",
+            "x": 576.046875,
+            "y": 334,
+            "right": 699.015625,
+            "bottom": 378,
+            "height": 44
+          },
+          {
+            "text": "스테이지",
+            "x": 705.015625,
+            "y": 334,
+            "right": 828,
+            "bottom": 378,
+            "height": 44
+          }
+        ]
+      },
+      "stageId": 2
+    },
+    {
+      "phase": "clear",
+      "stats": {
+        "time": 4.875000000000032,
+        "coins": 7,
+        "jumps": 1,
+        "perfects": 1,
+        "perfectLandings": 1,
+        "combo": 2,
+        "maxCombo": 2,
+        "misses": 0,
+        "score": 2202,
+        "lastSlope": 0.9901950814685883,
+        "lastJumpX": 304.9024592657058
+      },
+      "clock": 4.875000000000032,
+      "player": {
+        "x": 990.5227219496031,
+        "y": 490,
+        "vx": 195,
+        "vy": 0,
+        "angle": 0,
+        "surface": "high"
+      },
+      "snapshot": {
+        "phase": "clear",
+        "stage": 2,
+        "time": 4.875000000000032,
+        "coins": 7,
+        "totalCoins": 7,
+        "jumps": 1,
+        "perfects": 1,
+        "perfectLandings": 1,
+        "combo": 2,
+        "maxCombo": 2,
+        "misses": 0,
+        "score": 2202,
+        "bestTime": 4.875000000000032,
+        "newBest": true,
+        "lastSlope": 0.9901950814685883,
+        "lastJumpX": 304.9024592657058,
+        "progress": 0.9899177893080884,
+        "event": ""
+      },
+      "checkpoint": "high-landing",
+      "tracePoints": 309,
+      "stageIndex": 2,
+      "route": "high platform",
+      "launches": [
+        {
+          "requestedClock": 1.95,
+          "beforeClock": 0.3166666666666668,
+          "clock": 2.066666666666662,
+          "launchClock": 1.9999999999999953,
+          "x": 304.9024592657058,
+          "slope": 0.9901950814685883,
+          "vx": 298.44435532460733,
+          "measuredVy": 269.5181327344899,
+          "initialVy": 295.5181327344899,
+          "grounded": false,
+          "jumps": 1,
+          "perfectZones": [
+            {
+              "surface": "climb",
+              "x": 310,
+              "tolerance": 26
+            }
+          ],
+          "withinPerfectZone": true,
+          "pointer": {
+            "button": 0,
+            "isPrimary": true,
+            "pointerType": "touch",
+            "target": "CANVAS",
+            "phase": "playing",
+            "clock": 1.9999999999999953,
+            "controlsBlocked": false
+          },
+          "expectedSign": "positive"
+        }
+      ],
+      "record": {
+        "bestTime": 4.875000000000032,
+        "bestScore": 2202,
+        "clears": 1
+      },
+      "resultLayout": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "panel": {
+          "x": 557.046875,
+          "y": 0,
+          "right": 844,
+          "bottom": 390,
+          "clientHeight": 390,
+          "scrollHeight": 390
+        },
+        "buttons": [
+          {
+            "text": "다음 스테이지",
+            "x": 576.046875,
+            "y": 283,
+            "right": 828,
+            "bottom": 327,
+            "height": 44
+          },
+          {
+            "text": "다시 달리기",
+            "x": 576.046875,
+            "y": 334,
+            "right": 699.015625,
+            "bottom": 378,
+            "height": 44
+          },
+          {
+            "text": "스테이지",
+            "x": 705.015625,
+            "y": 334,
+            "right": 828,
+            "bottom": 378,
+            "height": 44
+          }
+        ]
+      },
+      "stageId": 3
+    },
+    {
+      "phase": "clear",
+      "stats": {
+        "time": 5.333333333333388,
+        "coins": 9,
+        "jumps": 2,
+        "perfects": 2,
+        "perfectLandings": 0,
+        "combo": 2,
+        "maxCombo": 2,
+        "misses": 0,
+        "score": 2657,
+        "lastSlope": -0.12,
+        "lastJumpX": 855.8679043085211
+      },
+      "clock": 5.333333333333388,
+      "player": {
+        "x": 1400.625,
+        "y": -35,
+        "vx": 195,
+        "vy": 0,
+        "angle": 0,
+        "surface": "finish"
+      },
+      "snapshot": {
+        "phase": "clear",
+        "stage": 3,
+        "time": 5.333333333333388,
+        "coins": 9,
+        "totalCoins": 9,
+        "jumps": 2,
+        "perfects": 2,
+        "perfectLandings": 0,
+        "combo": 2,
+        "maxCombo": 2,
+        "misses": 0,
+        "score": 2657,
+        "bestTime": 5.333333333333388,
+        "newBest": true,
+        "lastSlope": -0.12,
+        "lastJumpX": 855.8679043085211,
+        "progress": 0.9928435114503816,
+        "event": ""
+      },
+      "checkpoint": "low-route",
+      "tracePoints": 399,
+      "stageIndex": 3,
+      "route": "two downward launches",
+      "launches": [
+        {
+          "requestedClock": 1.45,
+          "beforeClock": 0.22499999999999998,
+          "clock": 1.5666666666666635,
+          "launchClock": 1.5083333333333304,
+          "x": 382.04966581964925,
+          "slope": -0.4703182905020178,
+          "vx": 380.06337276205784,
+          "measuredVy": -201.5007557598822,
+          "initialVy": -178.75075575988228,
+          "grounded": false,
+          "jumps": 1,
+          "perfectZones": [
+            {
+              "surface": "descent",
+              "x": 363,
+              "tolerance": 24
+            }
+          ],
+          "withinPerfectZone": true,
+          "pointer": {
+            "button": 0,
+            "isPrimary": true,
+            "pointerType": "touch",
+            "target": "CANVAS",
+            "phase": "playing",
+            "clock": 1.5083333333333304,
+            "controlsBlocked": false
+          },
+          "expectedSign": "negative"
+        },
+        {
+          "requestedClock": 3.2,
+          "beforeClock": 1.716666666666663,
+          "clock": 3.2916666666666576,
+          "launchClock": 3.2333333333333245,
+          "x": 855.8679043085211,
+          "slope": -0.12,
+          "vx": 417.0082721645073,
+          "measuredVy": -72.79099265974088,
+          "initialVy": -50.040992659740965,
+          "grounded": false,
+          "jumps": 2,
+          "perfectZones": [
+            {
+              "surface": "low",
+              "x": 860,
+              "tolerance": 20
+            }
+          ],
+          "withinPerfectZone": true,
+          "pointer": {
+            "button": 0,
+            "isPrimary": true,
+            "pointerType": "touch",
+            "target": "CANVAS",
+            "phase": "playing",
+            "clock": 3.2333333333333245,
+            "controlsBlocked": false
+          },
+          "expectedSign": "route-dependent"
+        }
+      ],
+      "record": {
+        "bestTime": 5.333333333333388,
+        "bestScore": 2657,
+        "clears": 1
+      },
+      "resultLayout": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "panel": {
+          "x": 557.046875,
+          "y": 0,
+          "right": 844,
+          "bottom": 390,
+          "clientHeight": 390,
+          "scrollHeight": 390
+        },
+        "buttons": [
+          {
+            "text": "다음 스테이지",
+            "x": 576.046875,
+            "y": 283,
+            "right": 828,
+            "bottom": 327,
+            "height": 44
+          },
+          {
+            "text": "다시 달리기",
+            "x": 576.046875,
+            "y": 334,
+            "right": 699.015625,
+            "bottom": 378,
+            "height": 44
+          },
+          {
+            "text": "스테이지",
+            "x": 705.015625,
+            "y": 334,
+            "right": 828,
+            "bottom": 378,
+            "height": 44
+          }
+        ]
+      },
+      "stageId": 4
+    },
+    {
+      "phase": "clear",
+      "stats": {
+        "time": 5.733333333333408,
+        "coins": 5,
+        "jumps": 2,
+        "perfects": 2,
+        "perfectLandings": 2,
+        "combo": 4,
+        "maxCombo": 4,
+        "misses": 0,
+        "score": 2617,
+        "lastSlope": -0.1,
+        "lastJumpX": 881.406722665217
+      },
+      "clock": 5.733333333333408,
+      "player": {
+        "x": 1470.6315884100343,
+        "y": 100,
+        "vx": 195,
+        "vy": 0,
+        "angle": 0,
+        "surface": "finish"
+      },
+      "snapshot": {
+        "phase": "clear",
+        "stage": 4,
+        "time": 5.733333333333408,
+        "coins": 5,
+        "totalCoins": 10,
+        "jumps": 2,
+        "perfects": 2,
+        "perfectLandings": 2,
+        "combo": 4,
+        "maxCombo": 4,
+        "misses": 0,
+        "score": 2617,
+        "bestTime": 5.733333333333408,
+        "newBest": true,
+        "lastSlope": -0.1,
+        "lastJumpX": 881.406722665217,
+        "progress": 0.99340252704932,
+        "event": ""
+      },
+      "checkpoint": "upper",
+      "tracePoints": 454,
+      "stageIndex": 4,
+      "route": "upper shortcut",
+      "launches": [
+        {
+          "requestedClock": 1.2,
+          "beforeClock": 0.26666666666666666,
+          "clock": 1.3499999999999976,
+          "launchClock": 1.274999999999998,
+          "x": 243.46020290537717,
+          "slope": 0.5166450711717273,
+          "vx": 373.1421669984599,
+          "measuredVy": 163.53206142609187,
+          "initialVy": 192.78206142609176,
+          "grounded": false,
+          "jumps": 1,
+          "perfectZones": [
+            {
+              "surface": "cubic",
+              "x": 225,
+              "tolerance": 28
+            },
+            {
+              "surface": "cubic",
+              "x": 400,
+              "tolerance": 24
+            }
+          ],
+          "withinPerfectZone": true,
+          "pointer": {
+            "button": 0,
+            "isPrimary": true,
+            "pointerType": "touch",
+            "target": "CANVAS",
+            "phase": "playing",
+            "clock": 1.274999999999998,
+            "controlsBlocked": false
+          },
+          "expectedSign": "route-dependent"
+        },
+        {
+          "requestedClock": 3.55,
+          "beforeClock": 1.5333333333333303,
+          "clock": 3.658333333333323,
+          "launchClock": 3.6166666666666565,
+          "x": 881.406722665217,
+          "slope": -0.1,
+          "vx": 417.91561988819547,
+          "measuredVy": -58.04156198881955,
+          "initialVy": -41.79156198881961,
+          "grounded": false,
+          "jumps": 2,
+          "perfectZones": [
+            {
+              "surface": "shortcut",
+              "x": 865,
+              "tolerance": 22
+            }
+          ],
+          "withinPerfectZone": true,
+          "pointer": {
+            "button": 0,
+            "isPrimary": true,
+            "pointerType": "touch",
+            "target": "CANVAS",
+            "phase": "playing",
+            "clock": 3.6166666666666565,
+            "controlsBlocked": false
+          },
+          "expectedSign": "route-dependent"
+        }
+      ],
+      "record": {
+        "bestTime": 5.733333333333408,
+        "bestScore": 2617,
+        "clears": 1
+      },
+      "resultLayout": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "panel": {
+          "x": 557.046875,
+          "y": 0,
+          "right": 844,
+          "bottom": 390,
+          "clientHeight": 390,
+          "scrollHeight": 390
+        },
+        "buttons": [
+          {
+            "text": "다시 달리기",
+            "x": 576.046875,
+            "y": 240.59375,
+            "right": 699.015625,
+            "bottom": 284.59375,
+            "height": 44
+          },
+          {
+            "text": "스테이지",
+            "x": 705.015625,
+            "y": 240.59375,
+            "right": 828,
+            "bottom": 284.59375,
+            "height": 44
+          }
+        ]
+      },
+      "stageId": 5
+    },
+    {
+      "phase": "clear",
+      "stats": {
+        "time": 6.958333333333469,
+        "coins": 9,
+        "jumps": 1,
+        "perfects": 1,
+        "perfectLandings": 1,
+        "combo": 2,
+        "maxCombo": 2,
+        "misses": 0,
+        "score": 2340,
+        "lastSlope": 0.22,
+        "lastJumpX": 966.9986585002307
+      },
+      "clock": 6.958333333333469,
+      "player": {
+        "x": 1470.199575376852,
+        "y": 100,
+        "vx": 195,
+        "vy": 0,
+        "angle": 0,
+        "surface": "finish"
+      },
+      "snapshot": {
+        "phase": "clear",
+        "stage": 4,
+        "time": 6.958333333333469,
+        "coins": 9,
+        "totalCoins": 10,
+        "jumps": 1,
+        "perfects": 1,
+        "perfectLandings": 1,
+        "combo": 2,
+        "maxCombo": 2,
+        "misses": 0,
+        "score": 2340,
+        "bestTime": 5.733333333333408,
+        "newBest": false,
+        "lastSlope": 0.22,
+        "lastJumpX": 966.9986585002307,
+        "progress": 0.9930982925189098,
+        "event": ""
+      },
+      "checkpoint": "lower",
+      "tracePoints": 479,
+      "stageIndex": 4,
+      "route": "lower coin route",
+      "launches": [
+        {
+          "requestedClock": 5,
+          "beforeClock": 0.3000000000000001,
+          "clock": 5.133333333333378,
+          "launchClock": 5.058333333333374,
+          "x": 966.9986585002307,
+          "slope": 0.22,
+          "vx": 410.19067601613773,
+          "measuredVy": 60.991948723550294,
+          "initialVy": 90.24194872355176,
+          "grounded": false,
+          "jumps": 1,
+          "perfectZones": [
+            {
+              "surface": "collection",
+              "x": 960,
+              "tolerance": 24
+            }
+          ],
+          "withinPerfectZone": true,
+          "pointer": {
+            "button": 0,
+            "isPrimary": true,
+            "pointerType": "touch",
+            "target": "CANVAS",
+            "phase": "playing",
+            "clock": 5.058333333333374,
+            "controlsBlocked": false
+          },
+          "expectedSign": "route-dependent"
+        }
+      ],
+      "record": {
+        "bestTime": 5.733333333333408,
+        "bestScore": 2617,
+        "clears": 2
+      },
+      "resultLayout": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "panel": {
+          "x": 557.046875,
+          "y": 0,
+          "right": 844,
+          "bottom": 390,
+          "clientHeight": 390,
+          "scrollHeight": 390
+        },
+        "buttons": [
+          {
+            "text": "다시 달리기",
+            "x": 576.046875,
+            "y": 240.59375,
+            "right": 699.015625,
+            "bottom": 284.59375,
+            "height": 44
+          },
+          {
+            "text": "스테이지",
+            "x": 705.015625,
+            "y": 240.59375,
+            "right": 828,
+            "bottom": 284.59375,
+            "height": 44
+          }
+        ]
+      },
+      "stageId": 5
+    },
+    {
+      "phase": "clear",
+      "stats": {
+        "time": 3.8166666666666558,
+        "coins": 7,
+        "jumps": 1,
+        "perfects": 1,
+        "perfectLandings": 1,
+        "combo": 2,
+        "maxCombo": 2,
+        "misses": 0,
+        "score": 2338,
+        "lastSlope": 0.2558509175678213,
+        "lastJumpX": 390.63853189148597
+      },
+      "clock": 3.8166666666666558,
+      "player": {
+        "x": 1001.0150419633915,
+        "y": 110,
+        "vx": 195,
+        "vy": 0,
+        "angle": 0,
+        "surface": "receiver"
+      },
+      "snapshot": {
+        "phase": "clear",
+        "stage": 0,
+        "time": 3.8166666666666558,
+        "coins": 7,
+        "totalCoins": 7,
+        "jumps": 1,
+        "perfects": 1,
+        "perfectLandings": 1,
+        "combo": 2,
+        "maxCombo": 2,
+        "misses": 0,
+        "score": 2338,
+        "bestTime": 3.8166666666666558,
+        "newBest": true,
+        "lastSlope": 0.2558509175678213,
+        "lastJumpX": 390.63853189148597,
+        "progress": 0.9903387547993456,
+        "event": "CHECKPOINT SAVED"
+      },
+      "checkpoint": "landing",
+      "tracePoints": 286,
+      "stageId": 1,
+      "stageIndex": 0,
+      "route": "fullscreen unavailable fallback",
+      "launches": [
+        {
+          "requestedClock": 1.65,
+          "beforeClock": 0.12499999999999999,
+          "clock": 1.741666666666663,
+          "launchClock": 1.691666666666663,
+          "x": 390.63853189148597,
+          "slope": 0.2558509175678213,
+          "vx": 406.89352440205664,
+          "measuredVy": 84.60408157067089,
+          "initialVy": 104.10408157067081,
+          "grounded": false,
+          "jumps": 1,
+          "perfectZones": [
+            {
+              "surface": "rise",
+              "x": 380,
+              "tolerance": 30
+            }
+          ],
+          "withinPerfectZone": true,
+          "pointer": {
+            "button": 0,
+            "isPrimary": true,
+            "pointerType": "touch",
+            "target": "CANVAS",
+            "phase": "playing",
+            "clock": 1.691666666666663,
+            "controlsBlocked": false
+          },
+          "expectedSign": "positive"
+        }
+      ],
+      "record": {
+        "bestTime": 3.8166666666666558,
+        "bestScore": 2338,
+        "clears": 1
+      },
+      "resultLayout": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "panel": {
+          "x": 557.046875,
+          "y": 0,
+          "right": 844,
+          "bottom": 390,
+          "clientHeight": 390,
+          "scrollHeight": 390
+        },
+        "buttons": [
+          {
+            "text": "다음 스테이지",
+            "x": 576.046875,
+            "y": 283,
+            "right": 828,
+            "bottom": 327,
+            "height": 44
+          },
+          {
+            "text": "다시 달리기",
+            "x": 576.046875,
+            "y": 334,
+            "right": 699.015625,
+            "bottom": 378,
+            "height": 44
+          },
+          {
+            "text": "스테이지",
+            "x": 705.015625,
+            "y": 334,
+            "right": 828,
+            "bottom": 378,
+            "height": 44
+          }
+        ]
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "Play opens five-stage selection with no old function buttons",
+      "passed": true
+    },
+    {
+      "name": "Stage 1: first landing clears through actual touchscreen taps",
+      "passed": true,
+      "time": 3.8166666666666558,
+      "coins": 7,
+      "jumps": 1
+    },
+    {
+      "name": "Stage 2: at the vertex clears through actual touchscreen taps",
+      "passed": true,
+      "time": 3.59999999999999,
+      "coins": 6,
+      "jumps": 1
+    },
+    {
+      "name": "Stage 3: high platform clears through actual touchscreen taps",
+      "passed": true,
+      "time": 4.875000000000032,
+      "coins": 7,
+      "jumps": 1
+    },
+    {
+      "name": "Stage 4: two downward launches clears through actual touchscreen taps",
+      "passed": true,
+      "time": 5.333333333333388,
+      "coins": 9,
+      "jumps": 2
+    },
+    {
+      "name": "Stage 5: upper shortcut clears through actual touchscreen taps",
+      "passed": true,
+      "time": 5.733333333333408,
+      "coins": 5,
+      "jumps": 2
+    },
+    {
+      "name": "Stage 5: lower coin route clears through actual touchscreen taps",
+      "passed": true,
+      "time": 6.958333333333469,
+      "coins": 9,
+      "jumps": 1
+    },
+    {
+      "name": "Stage 5 exposes a faster shortcut and a richer collection route",
+      "passed": true,
+      "upperTime": 5.733333333333408,
+      "lowerTime": 6.958333333333469,
+      "upperCoins": 5,
+      "lowerCoins": 9
+    },
+    {
+      "name": "All per-stage best records survive a real page reload",
+      "passed": true
+    },
+    {
+      "name": "740×360 touch pause freezes physics and scored time",
+      "passed": true
+    },
+    {
+      "name": "Actual fullscreen control exits without changing the paused run",
+      "passed": true
+    },
+    {
+      "name": "390×844 rotation shows the Korean landscape prompt and preserves the paused run",
+      "passed": true
+    },
+    {
+      "name": "740×360 real touch play reaches the result after rotation and UI restart",
+      "passed": true,
+      "launch": {
+        "requestedClock": 1.65,
+        "beforeClock": 0.20833333333333331,
+        "clock": 1.7833333333333294,
+        "launchClock": 1.7249999999999963,
+        "x": 396.93791751999,
+        "slope": 0.2519138015500062,
+        "vx": 407.275790840938,
+        "measuredVy": 79.84839275002588,
+        "initialVy": 102.5983927500258,
+        "grounded": false,
+        "jumps": 1,
+        "perfectZones": [
+          {
+            "surface": "rise",
+            "x": 380,
+            "tolerance": 30
+          }
+        ],
+        "withinPerfectZone": true,
+        "pointer": {
+          "button": 0,
+          "isPrimary": true,
+          "pointerType": "touch",
+          "target": "CANVAS",
+          "phase": "playing",
+          "clock": 1.7249999999999963,
+          "controlsBlocked": false
+        },
+        "expectedSign": "positive"
+      },
+      "time": 3.8166666666666558,
+      "resultLayout": {
+        "viewport": {
+          "width": 740,
+          "height": 360
+        },
+        "panel": {
+          "x": 488.40625,
+          "y": 0,
+          "right": 740,
+          "bottom": 360,
+          "clientHeight": 360,
+          "scrollHeight": 360
+        },
+        "buttons": [
+          {
+            "text": "다음 스테이지",
+            "x": 507.40625,
+            "y": 253,
+            "right": 724,
+            "bottom": 297,
+            "height": 44
+          },
+          {
+            "text": "다시 달리기",
+            "x": 507.40625,
+            "y": 304,
+            "right": 612.703125,
+            "bottom": 348,
+            "height": 44
+          },
+          {
+            "text": "스테이지",
+            "x": 618.703125,
+            "y": 304,
+            "right": 724,
+            "bottom": 348,
+            "height": 44
+          }
+        ]
+      }
+    },
+    {
+      "name": "Optional fullscreen/orientation APIs do not interrupt play",
+      "passed": true,
+      "supported": true,
+      "active": true,
+      "orientationLockAvailable": true
+    },
+    {
+      "name": "Stage 1: fullscreen unavailable fallback clears through actual touchscreen taps",
+      "passed": true,
+      "time": 3.8166666666666558,
+      "coins": 7,
+      "jumps": 1
+    },
+    {
+      "name": "Browser-enforced unavailable fullscreen falls back to a playable CSS landscape frame",
+      "passed": true
+    },
+    {
+      "name": "Browser console and runtime error checks are clean",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "docs/images/tangent-select.png",
+    "docs/images/tangent-stage.png",
+    "docs/images/tangent-result.png",
+    "docs/images/tangent-mobile-pause.png",
+    "docs/images/tangent-portrait.png",
+    "docs/images/tangent-mobile.png",
+    "docs/images/tangent-failure.png"
+  ],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "requestFailures": [],
+  "limitations": [
+    "Emulated touch is not a physical iOS/Android device",
+    "Fullscreen/orientation availability varies by browser",
+    "A completed scripted route does not establish fun or learning effectiveness"
+  ],
+  "completedAt": "2026-10-07T23:06:46.684Z",
+  "continuation": {
+    "startedAt": "2026-10-07T23:06:41.226Z",
+    "reason": "Retried only fullscreen policy fallback using a real HTTP proxy; the earlier intercepted document blocked Vite HMR through Chromium local-network classification",
+    "previousInfrastructureErrors": 3
+  }
+}

@@ -1,70 +1,64 @@
-export type Skill = "line" | "rise" | "dive" | "wave";
+/** Every gameplay coordinate is mathematical: positive y points upward. */
 export type Point = { x: number; y: number };
-export const FLOOR = 348;
-export const SKILLS = {
-  line: {
-    key: "1",
-    formula: "y = x",
-    name: "직선 대시",
-    english: "LINE DASH",
-    color: "#ff704e",
-    distance: 260,
-    duration: 0.4,
-    hint: "앞을 가르고, 빠르게 관통",
-  },
-  rise: {
-    key: "2",
-    formula: "y = x²",
-    name: "포물선 어퍼컷",
-    english: "SKY UPPERCUT",
-    color: "#9782ee",
-    distance: 240,
-    duration: 0.6,
-    hint: "곡선을 타고, 하늘로 치솟기",
-  },
-  dive: {
-    key: "3",
-    formula: "y = −x²",
-    name: "포물선 내려찍기",
-    english: "POWER DIVE",
-    color: "#efb636",
-    distance: 120,
-    duration: 0.34,
-    hint: "공중에서 급제동 · 충격판과 바닥 파괴",
-  },
-  wave: {
-    key: "4",
-    formula: "y = sin x",
-    name: "사인 웨이브",
-    english: "WAVE FLOW",
-    color: "#39ad94",
-    distance: 450,
-    duration: 1.05,
-    hint: "물결을 타고, 연속으로 타격",
-  },
-} as const;
-// Screen y grows downward. Vertical translations and a phase shift keep
-// the mathematical shape readable and the runner above the roof.
-export function trajectory(
-  skill: Skill,
-  start: Point,
-  progress: number,
-  floor = FLOOR,
-): Point {
-  const t = Math.max(0, Math.min(1, progress));
-  const x = start.x + SKILLS[skill].distance * t;
-  if (skill === "line") return { x, y: start.y - 44 * t };
-  if (skill === "rise")
-    return { x, y: start.y - Math.min(212, start.y - 64) * t * t };
-  if (skill === "dive") return { x, y: start.y + (floor - start.y) * t * t };
+/** Ascending coefficients: [a, b, c] describes a + bu + cu². */
+export type FunctionData = {
+  coefficients: number[];
+  origin: number;
+  scale: number;
+  yScale: number;
+  offset: number;
+};
+export type SurfaceData = {
+  id: string;
+  start: number;
+  end: number;
+  function: FunctionData;
+  color?: string;
+  motion?: {
+    axis: "x" | "y";
+    amplitude: number;
+    period: number;
+    phase?: number;
+  };
+};
+export function surfaceMotion(surface: SurfaceData, time = 0): Point {
+  const m = surface.motion;
+  if (!m || m.period <= 0) return { x: 0, y: 0 };
+  const distance =
+    m.amplitude * Math.sin((time / m.period) * Math.PI * 2 + (m.phase ?? 0));
+  return { x: m.axis === "x" ? distance : 0, y: m.axis === "y" ? distance : 0 };
+}
+export function surfaceRange(surface: SurfaceData, time = 0) {
+  const dx = surfaceMotion(surface, time).x;
+  return { start: surface.start + dx, end: surface.end + dx };
+}
+/** Horner evaluation and its analytic derivative always describe the same road. */
+export function sampleSurface(
+  surface: SurfaceData,
+  x: number,
+  time = 0,
+): { y: number; slope: number } {
+  const f = surface.function;
+  if (f.scale === 0)
+    throw new Error(`Surface ${surface.id} needs a nonzero function scale`);
+  const motion = surfaceMotion(surface, time);
+  const u = (x - motion.x - f.origin) / f.scale;
+  let value = 0,
+    derivative = 0;
+  for (let i = f.coefficients.length - 1; i >= 0; i--) {
+    derivative = derivative * u + value;
+    value = value * u + f.coefficients[i];
+  }
   return {
-    x,
-    y:
-      start.y -
-      Math.min(88, (start.y - 62) / 2) * (1 - Math.cos(t * 3 * Math.PI)),
+    y: f.offset + f.yScale * value + motion.y,
+    slope: (f.yScale / f.scale) * derivative,
   };
 }
-// Swept collision avoids tunnelling even on a slow mobile frame.
+export function tangentVelocity(slope: number, speed: number): Point {
+  const vx = speed / Math.hypot(1, slope);
+  return { x: vx, y: vx * slope };
+}
+/** Swept pickups keep fast launches from tunnelling through a small coin. */
 export function segmentDistance(p: Point, a: Point, b: Point): number {
   const dx = b.x - a.x,
     dy = b.y - a.y;
