@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-10-07T23:18:44.838Z",
+  "url": "http://localhost:5173",
+  "status": "passed",
+  "viewport": {
+    "width": 844,
+    "height": 390,
+    "isMobile": true,
+    "hasTouch": true,
+    "deviceScaleFactor": 2
+  },
+  "mode": "Fresh Chromium page, real-time automatic run; UI menu touches only, no gameplay tap, no fake clock or game-state mutation",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "checks": [
+    {
+      "name": "No gameplay tap: first miss reached naturally",
+      "passed": true
+    },
+    {
+      "name": "Half-second checkpoint retry resumes real simulation",
+      "passed": true
+    },
+    {
+      "name": "Camera immediately places hero near 36% screen anchor",
+      "passed": true
+    },
+    {
+      "name": "Respawn restores zoom1, empty initial coins and score",
+      "passed": true
+    },
+    {
+      "name": "Failed excursion trace rolls back to a small restarted path",
+      "passed": true
+    },
+    {
+      "name": "No console or uncaught runtime errors",
+      "passed": true
+    }
+  ],
+  "browserVersion": "151.0.7922.34",
+  "atMiss": {
+    "phase": "miss",
+    "runPhase": "miss",
+    "clock": 3.0416666666666585,
+    "stats": {
+      "time": 4.041666666666659,
+      "coins": 4,
+      "jumps": 0,
+      "perfects": 0,
+      "perfectLandings": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "misses": 1,
+      "score": 400,
+      "lastSlope": 0,
+      "lastJumpX": 0
+    },
+    "player": {
+      "x": 644.632441795471,
+      "y": 63.99194919611925,
+      "vx": 190.74688308926886,
+      "vy": -333.2453509862289,
+      "angle": -1.0036360169843435,
+      "surface": null
+    },
+    "camera": {
+      "x": 293.5114234387476,
+      "y": 93.87177154958367,
+      "zoom": 0.9100821843544932
+    },
+    "tracePoints": 187,
+    "missRemaining": 0.4833333333333333
+  },
+  "afterRespawn": {
+    "phase": "playing",
+    "runPhase": "playing",
+    "clock": 3.5416666666666567,
+    "stats": {
+      "time": 4.541666666666684,
+      "coins": 0,
+      "jumps": 0,
+      "perfects": 0,
+      "perfectLandings": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "misses": 1,
+      "score": 0,
+      "lastSlope": 0,
+      "lastJumpX": 0
+    },
+    "player": {
+      "x": 82.96425823472207,
+      "y": 79.33117032222427,
+      "vx": 177.88629465750233,
+      "vy": 79.88407959677735,
+      "angle": 0.42131218369983914,
+      "surface": "rise"
+    },
+    "camera": {
+      "x": -220.2184230164384,
+      "y": 78.3931104507658,
+      "zoom": 1
+    },
+    "width": 836.3716771619478,
+    "height": 460,
+    "normalizedScreenX": 0.36249754688005154,
+    "tracePoints": 3,
+    "collected": [],
+    "checkpoint": "start",
+    "start": {
+      "surface": "rise",
+      "x": 80
+    }
+  },
+  "completedAt": "2026-10-07T23:18:50.620Z"
+}
