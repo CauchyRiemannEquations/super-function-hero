@@ -1,25 +1,20 @@
-import type { Skill } from "./trajectory";
-
 export const INPUT_BUFFER_SECONDS = 0.14;
 export const INPUT_GUARD_SECONDS = 0.12;
-
-// One intent only. Simulation time freezes with hit stop, but pause/end/reset
-// explicitly discard it so an old tap can never fire on resume or restart.
-export class SkillInputBuffer {
-  pending: { skill: Skill; expires: number; waitForEnd: boolean } | null = null;
-  queue(skill: Skill, now: number, waitForEnd: boolean) {
-    this.pending = { skill, expires: now + INPUT_BUFFER_SECONDS, waitForEnd };
+/** A tap shortly before landing becomes one jump on contact, never a double jump. */
+export class JumpInputBuffer {
+  pending: { expires: number } | null = null;
+  queue(now: number) {
+    this.pending = { expires: now + INPUT_BUFFER_SECONDS };
   }
-  consume(now: number, guardOpen: boolean, actionEnded: boolean): Skill | null {
-    const intent = this.pending;
-    if (!intent) return null;
-    if (now > intent.expires) {
+  consume(now: number, canJump: boolean): boolean {
+    if (!this.pending) return false;
+    if (now > this.pending.expires + 1e-9) {
       this.clear();
-      return null;
+      return false;
     }
-    if (!guardOpen || (intent.waitForEnd && !actionEnded)) return null;
+    if (!canJump) return false;
     this.clear();
-    return intent.skill;
+    return true;
   }
   clear() {
     this.pending = null;

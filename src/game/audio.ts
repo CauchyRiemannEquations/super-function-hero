@@ -2,8 +2,13 @@ export class AudioFx {
   enabled = true;
   context?: AudioContext;
   unlock() {
-    this.context ??= new AudioContext();
-    if (this.context.state === "suspended") void this.context.resume();
+    try {
+      this.context ??= new AudioContext();
+      if (this.context.state === "suspended")
+        void this.context.resume().catch(() => {});
+    } catch {
+      /* Silent play remains possible without Web Audio. */
+    }
   }
   play(kind: "skill" | "hit" | "hurt" | "clear", pitch = 0) {
     if (!this.enabled || !this.context || this.context.state !== "running")

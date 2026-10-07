@@ -1,0 +1,165 @@
+{
+  "generatedAt": "2026-10-07T23:15:49.144Z",
+  "status": "passed",
+  "artifact": "artifacts/PLAY-SUPER-FUNCTION-HERO.html",
+  "sha256": "0d75252e3532f53668e38aec67e7aad4e8cf82655ee67436146ce4d8a8c5a938",
+  "mode": "Production standalone HTML via file URL; real-time browser rendering; visible HUD timer read only; actual keyboard Space; no game hook, state mutation or fake clock",
+  "viewport": {
+    "width": 844,
+    "height": 390,
+    "deviceScaleFactor": 1,
+    "isMobile": false,
+    "hasTouch": false
+  },
+  "remotePolicy": "Every http/https request aborted; no remote response permitted",
+  "browserVersion": "151.0.7922.34",
+  "checks": [
+    {
+      "name": "Local file opens the production title with inline code and no development game hook",
+      "passed": true,
+      "evidence": {
+        "hookPresent": false,
+        "actualViewport": {
+          "width": 844,
+          "height": 390
+        },
+        "scheme": "file:",
+        "scripts": [
+          {
+            "src": null,
+            "type": "module"
+          }
+        ],
+        "fontFamily": "\"DM Sans\", \"Noto Sans KR\", sans-serif",
+        "loadedFontFaces": [],
+        "fallbackWidths": {
+          "configured": 261.3207702636719,
+          "generic": 270.515625
+        }
+      }
+    },
+    {
+      "name": "Play opens the five-stage selection screen",
+      "passed": true
+    },
+    {
+      "name": "Stage 1 clears through actual Space input with one jump, collected coins and zero misses",
+      "passed": true,
+      "evidence": {
+        "heading": "CLEAR!",
+        "stats": {
+          "COIN": "7 / 7",
+          "JUMP": "1",
+          "PERFECT TANGENT": "×1",
+          "PERFECT LANDING": "×1",
+          "MAX COMBO": "×2",
+          "SCORE": "2,338"
+        },
+        "best": "BEST TIME3.82 sMISS 0",
+        "time": "3.82s"
+      }
+    },
+    {
+      "name": "No page errors or remote responses while all HTTP/HTTPS requests are blocked",
+      "passed": true
+    },
+    {
+      "name": "Blocked remote font stylesheet falls back to local sans-serif and visible text",
+      "passed": true,
+      "evidence": {
+        "fontFamily": "\"DM Sans\", \"Noto Sans KR\", sans-serif",
+        "platformFonts": {
+          "english": [
+            {
+              "familyName": "Arial Black",
+              "postScriptName": "Arial-Black",
+              "isCustomFont": false,
+              "glyphCount": 6
+            }
+          ],
+          "korean": [
+            {
+              "familyName": "Noto Sans KR",
+              "postScriptName": "Noto-Sans-KR-Bold",
+              "isCustomFont": false,
+              "glyphCount": 11
+            }
+          ],
+          "loadedRemoteFontFaces": []
+        },
+        "bounds": {
+          "x": 557.046875,
+          "y": 0,
+          "width": 286.953125,
+          "height": 390
+        }
+      }
+    }
+  ],
+  "blockedRemoteRequests": [
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap",
+      "resourceType": "stylesheet"
+    }
+  ],
+  "remoteResponses": [],
+  "pageErrors": [],
+  "consoleErrors": [
+    "Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "Unsafe attempt to load URL file:///C:/Users/USER/Documents/Codex/2026-10-08/super-function-hero-github-super-function/work/super-function-hero/artifacts/PLAY-SUPER-FUNCTION-HERO.html from frame with URL file:///C:/Users/USER/Documents/Codex/2026-10-08/super-function-hero-github-super-function/work/super-function-hero/artifacts/PLAY-SUPER-FUNCTION-HERO.html. 'file:' URLs are treated as unique security origins.\n"
+  ],
+  "limitations": [
+    "Desktop Chromium at a mobile landscape viewport, using keyboard; native iOS/Android and real touch are outside this standalone check.",
+    "Remote Google Fonts stylesheet is intentionally blocked; declared local sans-serif fallbacks render instead.",
+    "This standalone check covers Stage 1; all six stage routes are covered separately by pure simulation and live-browser verification."
+  ],
+  "input": {
+    "method": "Playwright keyboard.press Space, focused actual canvas",
+    "visibleHudBefore": "1.60s",
+    "requestedAtHudAtLeastSeconds": 1.58
+  },
+  "fontEvidence": {
+    "english": [
+      {
+        "familyName": "Arial Black",
+        "postScriptName": "Arial-Black",
+        "isCustomFont": false,
+        "glyphCount": 6
+      }
+    ],
+    "korean": [
+      {
+        "familyName": "Noto Sans KR",
+        "postScriptName": "Noto-Sans-KR-Bold",
+        "isCustomFont": false,
+        "glyphCount": 11
+      }
+    ],
+    "loadedRemoteFontFaces": []
+  },
+  "result": {
+    "heading": "CLEAR!",
+    "time": "3.82s",
+    "stats": {
+      "COIN": "7 / 7",
+      "JUMP": "1",
+      "PERFECT TANGENT": "×1",
+      "PERFECT LANDING": "×1",
+      "MAX COMBO": "×2",
+      "SCORE": "2,338"
+    },
+    "best": "BEST TIME3.82 sMISS 0",
+    "lastJump": "LAST JUMPPositive slope ↗x = 376.5 · slope 0.26",
+    "text": " RUN COMPLETE / 01CLEAR!3.82sNEW BESTCOIN7 / 7JUMP1PERFECT TANGENT×1PERFECT LANDING×1MAX COMBO×2SCORE2,338BEST TIME3.82 sMISS 0LAST JUMPPositive slope ↗x = 376.5 · slope 0.26다음 스테이지  다시 달리기스테이지 ",
+    "fontFamily": "\"DM Sans\", \"Noto Sans KR\", sans-serif",
+    "bounds": {
+      "x": 557.046875,
+      "y": 0,
+      "width": 286.953125,
+      "height": 390
+    }
+  },
+  "screenshot": "docs/images/tangent-standalone.png",
+  "completedAt": "2026-10-07T23:15:55.035Z",
+  "wallTimeSeconds": 5.891
+}

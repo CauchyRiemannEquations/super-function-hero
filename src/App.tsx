@@ -1,32 +1,30 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
+  ArrowLeft,
+  ArrowRight,
   ArrowUpRight,
-  AudioLines,
-  ChevronRight,
+  Check,
   CircleHelp,
-  Heart,
+  Coins,
+  Flag,
   Maximize2,
   Pause,
   Play,
   RotateCcw,
+  Settings2,
+  Smartphone,
+  Trophy,
   Volume2,
   VolumeX,
   X,
   Zap,
-  Flag,
-  Trophy,
 } from "lucide-react";
 import { Game, INITIAL, type Snapshot } from "./game/engine";
-import { CHAPTERS, DURATION, REQUIRED_CORES } from "./game/stage";
-import { SKILLS, type Skill } from "./game/trajectory";
-import Graph from "./components/SkillGraph";
-import MobileSkills from "./components/MobileSkills";
+import { STAGES, type StageData } from "./game/stage";
+import { sampleSurface } from "./game/trajectory";
+import { loadRecords, loadSettings, saveSettings } from "./game/records";
+import { enterGameFullscreen, leaveGameFullscreen } from "./game/browser-mode";
 import TitleScreen from "./components/TitleScreen";
-import {
-  MOBILE_LANDSCAPE,
-  enterGameFullscreen,
-  leaveGameFullscreen,
-} from "./game/browser-mode";
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(() => matchMedia(query).matches);
@@ -40,38 +38,79 @@ function useMediaQuery(query: string) {
   return matches;
 }
 
+const timeLabel = (time: number) => time.toFixed(2);
+const guideLabel = (guide: StageData["guide"]) =>
+  guide === "always"
+    ? "접선 가이드 ON"
+    : guide === "pulse"
+      ? "짧은 접선 가이드"
+      : "힌트로 접선 보기";
+
+function StagePreview({ stage }: { stage: StageData }) {
+  const surface = stage.surfaces[0];
+  const samples = Array.from(
+    { length: 41 },
+    (_, index) =>
+      sampleSurface(
+        surface,
+        surface.start + ((surface.end - surface.start) * index) / 40,
+      ).y,
+  );
+  const minimum = Math.min(...samples);
+  const range = Math.max(1, Math.max(...samples) - minimum);
+  const points = samples.map((y, index) => ({
+    x: 5 + (index * 150) / 40,
+    y: 102 - ((y - minimum) / range) * 86,
+  }));
+  const path = points
+    .map(
+      (point, index) =>
+        `${index ? "L" : "M"}${point.x.toFixed(1)} ${point.y.toFixed(1)}`,
+    )
+    .join(" ");
+  const last = points[points.length - 1];
+  return (
+    <svg className="stage-preview" viewBox="0 0 160 115" aria-hidden="true">
+      <path className="preview-shadow" d={path} />
+      <path d={path} />
+      <circle cx={last.x} cy={last.y} r="4" />
+    </svg>
+  );
+}
+
 export default function App() {
-  const canvas = useRef<HTMLCanvasElement>(null),
-    engine = useRef<Game | null>(null),
-    arena = useRef<HTMLDivElement>(null);
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const engine = useRef<Game | null>(null);
+  const arena = useRef<HTMLDivElement>(null);
+  const dialog = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<Snapshot>({ ...INITIAL });
-  const [muted, setMuted] = useState(false),
-    [help, setHelp] = useState(false),
-    [debug, setDebug] = useState(false);
-  const [fullscreen, setFullscreen] = useState(false),
-    [best, setBest] = useState(0);
-  const landscape = useMediaQuery(MOBILE_LANDSCAPE);
+  const [preferences, setPreferences] = useState(loadSettings);
+  const [help, setHelp] = useState(false);
+  const [settings, setSettings] = useState(false);
+  const [hint, setHint] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [selected, setSelected] = useState(0);
+  const [records, setRecords] = useState(loadRecords);
+  const immersive = useMediaQuery(
+    "(orientation: landscape) and (max-height: 600px)",
+  );
   const touch = useMediaQuery("(pointer: coarse)");
-  const immersive = landscape;
+  const portrait = useMediaQuery(
+    "(orientation: portrait) and (max-width: 900px)",
+  );
+
   useLayoutEffect(() => {
-    const scroll = window.scrollY;
     document.body.classList.toggle("game-immersive", immersive);
-    engine.current?.setImmersive(immersive);
     if (immersive) window.scrollTo(0, 0);
-    return () => {
-      document.body.classList.remove("game-immersive");
-      if (immersive) window.scrollTo(0, scroll);
-    };
+    return () => document.body.classList.remove("game-immersive");
   }, [immersive]);
+
   useEffect(() => {
-    try {
-      setBest(Number(localStorage.getItem("curve-run-best") || 0));
-    } catch {
-      /* Private browsing is supported. */
-    }
     const game = new Game(canvas.current!, setState);
     engine.current = game;
-    game.setImmersive(matchMedia(MOBILE_LANDSCAPE).matches);
+    const saved = loadSettings();
+    game.audio.enabled = !saved.muted;
+    game.setReducedMotion(saved.reducedMotion);
     if (import.meta.env.DEV)
       (window as unknown as { __curveGame?: Game }).__curveGame = game;
     return () => {
@@ -81,16 +120,62 @@ export default function App() {
         delete (window as unknown as { __curveGame?: Game }).__curveGame;
     };
   }, []);
+
   useEffect(() => {
-    if (state.score > best && ["clear", "over"].includes(state.phase)) {
-      setBest(state.score);
-      try {
-        localStorage.setItem("curve-run-best", String(state.score));
-      } catch {
-        /* Storage is optional. */
+    if (portrait && state.phase === "playing") engine.current?.pause();
+  }, [portrait, state.phase]);
+
+  useEffect(() => {
+    engine.current?.setControlsBlocked(help || settings || portrait);
+  }, [help, settings, portrait]);
+
+  useEffect(() => {
+    if (!help && !settings && !portrait && state.phase !== "paused") return;
+    const container = dialog.current;
+    if (!container) return;
+    const previous = document.activeElement;
+    const controls = () =>
+      Array.from(
+        container.querySelectorAll<HTMLElement>(
+          "button:not(:disabled), input:not(:disabled), [tabindex='0']",
+        ),
+      );
+    (controls()[0] ?? container).focus({ preventScroll: true });
+    const onTab = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") return;
+      const items = controls();
+      if (!items.length) {
+        event.preventDefault();
+        container.focus();
+        return;
       }
-    }
-  }, [state.phase, state.score, best]);
+      const first = items[0],
+        last = items[items.length - 1];
+      if (
+        event.shiftKey &&
+        (document.activeElement === first ||
+          document.activeElement === container)
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    container.addEventListener("keydown", onTab);
+    return () => {
+      container.removeEventListener("keydown", onTab);
+      if (previous instanceof HTMLElement && previous.isConnected)
+        previous.focus({ preventScroll: true });
+    };
+  }, [help, settings, portrait, state.phase]);
+
+  useEffect(() => {
+    if (state.phase === "select" || state.phase === "clear")
+      setRecords(loadRecords());
+  }, [state.phase]);
+
   useEffect(() => {
     const onFull = () => {
       setFullscreen(Boolean(document.fullscreenElement));
@@ -105,430 +190,669 @@ export default function App() {
     document.addEventListener("fullscreenchange", onFull);
     return () => document.removeEventListener("fullscreenchange", onFull);
   }, []);
-  const start = () => {
+
+  const selectStages = () => {
     setHelp(false);
-    engine.current?.start();
-    if (landscape && arena.current)
+    setSettings(false);
+    setSelected(state.stage);
+    engine.current?.select();
+  };
+  const start = (index: number) => {
+    setHelp(false);
+    setSettings(false);
+    setHint(false);
+    engine.current?.setHint(false);
+    engine.current?.start(index);
+    canvas.current?.focus({ preventScroll: true });
+    if (touch && immersive && arena.current)
       void enterGameFullscreen(arena.current, true);
   };
-  const exit = () => {
+  const title = () => {
     setHelp(false);
+    setSettings(false);
     engine.current?.returnToTitle();
     void leaveGameFullscreen();
   };
-  const sound = () => {
-    const next = !muted;
-    setMuted(next);
+  const openHelp = () => {
+    if (state.phase === "playing" || state.phase === "miss")
+      engine.current?.pause();
+    setHelp(true);
+  };
+  const changeSound = () => {
+    const next = { ...preferences, muted: !preferences.muted };
+    setPreferences(next);
+    saveSettings(next);
     if (engine.current) {
-      engine.current.audio.enabled = !next;
-      if (!next) engine.current.audio.unlock();
+      engine.current.audio.enabled = !next.muted;
+      if (!next.muted) engine.current.audio.unlock();
     }
   };
-  const openHelp = () => {
-    if (state.phase === "playing") engine.current?.pause();
-    setHelp(true);
+  const changeMotion = () => {
+    const next = { ...preferences, reducedMotion: !preferences.reducedMotion };
+    setPreferences(next);
+    saveSettings(next);
+    engine.current?.setReducedMotion(next.reducedMotion);
   };
   const full = async () => {
     if (document.fullscreenElement) await leaveGameFullscreen();
-    else if (arena.current) await enterGameFullscreen(arena.current, landscape);
+    else if (arena.current) await enterGameFullscreen(arena.current, touch);
   };
-  const playable = state.phase === "playing";
-  const chapter = CHAPTERS[state.chapter];
+  const togglePause = () => {
+    engine.current?.togglePause();
+    canvas.current?.focus({ preventScroll: true });
+  };
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.repeat) return;
+      const interactive =
+        event.target instanceof Element &&
+        Boolean(event.target.closest("button, input, select, textarea, a"));
+      if (event.key === "Escape" && (help || settings)) {
+        event.preventDefault();
+        setHelp(false);
+        setSettings(false);
+        return;
+      }
+      const stageCard =
+        event.target instanceof Element &&
+        Boolean(event.target.closest(".stage-card"));
+      if (help || settings || portrait || (interactive && !stageCard)) return;
+      if (state.phase === "ready" && event.key === "Enter") {
+        event.preventDefault();
+        selectStages();
+      } else if (state.phase === "select") {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          start(selected);
+        }
+        if (event.key === "Escape") {
+          event.preventDefault();
+          title();
+        }
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          setSelected((value) => Math.min(STAGES.length - 1, value + 1));
+        }
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          setSelected((value) => Math.max(0, value - 1));
+        }
+      } else if (state.phase === "clear" && event.key === "Enter") {
+        event.preventDefault();
+        start(state.stage < STAGES.length - 1 ? state.stage + 1 : state.stage);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [
+    state.phase,
+    state.stage,
+    selected,
+    help,
+    settings,
+    portrait,
+    touch,
+    immersive,
+  ]);
+
+  const stage = STAGES[state.stage] ?? STAGES[0];
+  const chosen = STAGES[selected] ?? STAGES[0];
+  const running = ["playing", "paused", "miss"].includes(state.phase);
+  const modalOpen = help || settings;
+  const totalClears = Object.values(records).filter(
+    (record) => record.clears > 0,
+  ).length;
+
   return (
-    <main className={`shell ${immersive ? "immersive" : ""}`}>
+    <main
+      className={`shell ${immersive ? "immersive" : ""} ${preferences.reducedMotion ? "reduced-motion" : ""}`}
+    >
       <header className="header">
-        <a className="brand" href="./" aria-label="Super Function Hero 홈">
+        <button
+          className="brand"
+          onClick={title}
+          aria-label="Super Function Hero 타이틀로"
+        >
           <span className="brand-mark">
             <Zap size={23} strokeWidth={2.5} />
           </span>
-          <span>
-            <span className="brand-word">
-              SUPER FUNCTION <b>HERO</b>
-            </span>
-            <i />
+          <span className="brand-word">
+            SUPER FUNCTION <b>HERO</b>
           </span>
-        </a>
+        </button>
         <div className="header-right">
-          <span className="prototype">
-            <span /> PLAYABLE PROTOTYPE <b>01</b>
+          <span className="edition">
+            <i /> TANGENT PARKOUR <b>01—05</b>
           </span>
-          <span className="header-divider" />
           <button className="text-button" onClick={openHelp}>
-            <CircleHelp size={17} />
-            플레이 가이드
+            <CircleHelp size={17} /> 플레이 가이드
           </button>
         </div>
       </header>
       <section className="intro">
         <div>
-          <div className="eyebrow">
-            <span /> A LITTLE MATH. A LOT OF ACTION.
-          </div>
-          <h1>
-            함수를 타고,
-            <br className="mobile-break" /> <span>한계를 넘어.</span>
-            <span className="title-star">✳</span>
-          </h1>
+          <span className="eyebrow">THE CURVE IS YOUR PLAYGROUND</span>
+          <h2>
+            곡선을 달려. <span>순간을 뛰어.</span>
+          </h2>
+        </div>
+        <div className="intro-note">
+          <span className="intro-spark">✳</span>
           <p>
-            곡선은 당신의 기술. 리듬은 당신의 무기.
-            <span className="desktop-copy">
-              {" "}
-              네 가지 함수로 옥상을 질주하세요.
-            </span>
+            단 한 번의 탭.
+            <br />
+            <strong>당신이 만드는 하나의 궤적.</strong>
           </p>
         </div>
-        <div className="mission-label">
-          <span className="mission-icon">
-            <Flag size={23} />
-          </span>
-          <div>
-            <span>RUN 01 / V0.2</span>
-            <strong>스카이라인 돌파</strong>
-            <small>60초 · CORE로 길을 여는 연속 코스</small>
-          </div>
-          <ArrowUpRight size={20} />
-        </div>
       </section>
-
       <div
-        className={`arena ${fullscreen ? "fullscreen" : ""} ${state.phase === "ready" ? "is-ready" : ""}`}
+        className={`arena phase-${state.phase} ${fullscreen ? "fullscreen" : ""}`}
         ref={arena}
       >
-        <section className="game-stage" aria-label="게임 화면">
+        <section className="game-stage" aria-label="Tangent Parkour 게임 화면">
           <canvas
             ref={canvas}
-            aria-label="자동으로 달리는 캐릭터와 함수 궤적이 표시되는 횡스크롤 게임"
+            tabIndex={0}
+            aria-label="함수 그래프 위를 달리는 졸라맨. 화면 탭 또는 Space로 접선 방향 점프."
           />
-          <div className="hud">
-            <div className="health">
-              <span className="hud-label">ENERGY</span>
-              <div aria-label={`HP ${state.hp} / 3`}>
-                {[0, 1, 2].map((i) => (
-                  <Heart
-                    key={i}
-                    size={20}
-                    className={i < state.hp ? "alive" : "empty"}
-                    fill={i < state.hp ? "currentColor" : "none"}
-                  />
-                ))}
-              </div>
-            </div>
-            <div className="score">
-              <span className="hud-label">SCORE</span>
-              <strong>{String(state.score).padStart(6, "0")}</strong>
-            </div>
-            <div className="core-counter">
-              <span className="hud-label">CORE</span>
-              <strong>
-                {state.cores}
-                <small>/{REQUIRED_CORES}</small>
-              </strong>
-            </div>
-            <div className="stage-time">
-              <span className="hud-label">STAGE 01</span>
-              <div>
-                <span className="progress">
-                  <i style={{ width: `${(state.time / DURATION) * 100}%` }} />
+          {running && (
+            <div className="hud">
+              <div className="hud-stage">
+                <span className="hud-label">
+                  STAGE {String(state.stage + 1).padStart(2, "0")}
                 </span>
+                <strong>{stage.name}</strong>
+              </div>
+              <div className="hud-coins">
+                <Coins size={18} />
                 <strong>
-                  {String(
-                    Math.max(0, DURATION - Math.floor(state.time)),
-                  ).padStart(2, "0")}
+                  {state.coins}
+                  <small> / {state.totalCoins}</small>
+                </strong>
+              </div>
+              <div className="hud-time">
+                <span className="hud-label">TIME</span>
+                <strong>
+                  {timeLabel(state.time)}
                   <small>s</small>
                 </strong>
               </div>
-            </div>
-            <div className="game-tools">
               <button
-                aria-label={muted ? "효과음 켜기" : "효과음 끄기"}
-                onClick={sound}
-              >
-                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </button>
-              <button aria-label="전체 화면" onClick={full}>
-                <Maximize2 size={17} />
-              </button>
-              <button
-                aria-label={state.phase === "paused" ? "계속하기" : "일시정지"}
-                disabled={!["playing", "paused"].includes(state.phase)}
-                onClick={() => engine.current?.togglePause()}
+                className="icon-button pause-button"
+                onClick={togglePause}
+                aria-label={
+                  state.phase === "paused" ? "계속 달리기" : "일시정지"
+                }
               >
                 {state.phase === "paused" ? (
-                  <Play size={18} />
+                  <Play size={20} />
                 ) : (
-                  <Pause size={18} />
+                  <Pause size={20} />
                 )}
               </button>
-              {immersive && state.phase !== "ready" && (
-                <button aria-label="게임 화면 나가기" onClick={exit}>
-                  <X size={18} />
-                </button>
+            </div>
+          )}
+          {state.phase === "playing" && (
+            <>
+              <div className="run-progress" aria-hidden="true">
+                <i
+                  style={{
+                    width: `${Math.max(0, Math.min(1, state.progress)) * 100}%`,
+                  }}
+                />
+              </div>
+              {state.stage < 3 && state.time < 5 && (
+                <div className="tap-guide">
+                  화면을 탭하면, 길이 향하는 방향으로 점프{" "}
+                  <span>
+                    <kbd>Space</kbd> / TAP
+                  </span>
+                </div>
               )}
-            </div>
-          </div>
-          {touch && !landscape && playable && (
-            <span className="rotation-hint">
-              ↔ 가로로 돌리면 더 넓게 플레이할 수 있어요
-            </span>
-          )}
-          {playable && (
-            <div className="chapter-chip" key={`chapter-${state.chapter}`}>
-              <span>0{state.chapter + 1} /</span>
-              {chapter.name}
-            </div>
-          )}
-          {state.combo > 1 && playable && (
-            <div className="combo" key={`combo-${state.combo}`}>
-              <span>COMBO</span>
-              <strong>×{state.combo}</strong>
-            </div>
-          )}
-          {state.phase === "ready" && !help && (
-            <TitleScreen start={start} help={openHelp} />
-          )}
-          {state.phase === "paused" && !help && (
-            <div className="overlay">
-              <div className="modal pause-modal">
-                <span className="eyebrow">TAKE A BREATHER</span>
-                <h2>잠깐, 숨 고르기.</h2>
-                <p>당신의 다음 곡선을 기다리고 있어요.</p>
-                <button
-                  className="primary"
-                  onClick={() => engine.current?.togglePause()}
+              {state.event && (
+                <div
+                  className={`run-event ${state.event.includes("PERFECT") ? "perfect-event" : ""}`}
+                  key={state.event}
                 >
-                  계속 달리기 <Play size={19} />
+                  <span>{state.event}</span>
+                  {state.combo > 1 && <small>COMBO ×{state.combo}</small>}
+                </div>
+              )}
+            </>
+          )}
+          {state.phase === "miss" && (
+            <div className="miss-flash" role="status">
+              <strong>MISS!</strong>
+              <span>체크포인트에서 바로 다시 · +1s</span>
+            </div>
+          )}
+          {state.phase === "ready" && !modalOpen && (
+            <TitleScreen
+              start={selectStages}
+              help={openHelp}
+              settings={() => setSettings(true)}
+            />
+          )}
+          {state.phase === "select" && !modalOpen && (
+            <div className="stage-select">
+              <div className="select-heading">
+                <div>
+                  <span className="eyebrow">CHOOSE YOUR RUN</span>
+                  <h2>다음 자취는 어디로?</h2>
+                </div>
+                <button
+                  className="icon-button"
+                  onClick={title}
+                  aria-label="타이틀로 돌아가기"
+                >
+                  <ArrowLeft size={21} />
                 </button>
-                <button className="secondary" onClick={start}>
-                  <RotateCcw size={16} />
-                  처음부터 다시
+              </div>
+              <div
+                className="stage-grid"
+                role="group"
+                aria-label="스테이지 선택"
+              >
+                {STAGES.map((item, index) => {
+                  const record = records[item.id];
+                  return (
+                    <button
+                      key={item.id}
+                      className={`stage-card ${selected === index ? "selected" : ""} ${record?.clears ? "cleared" : ""}`}
+                      onClick={() => setSelected(index)}
+                      aria-pressed={selected === index}
+                    >
+                      <div className="card-top">
+                        <span>0{index + 1}</span>
+                        {record?.clears ? (
+                          <Check size={16} />
+                        ) : (
+                          <ArrowUpRight size={16} />
+                        )}
+                      </div>
+                      <StagePreview stage={item} />
+                      <strong>{item.name}</strong>
+                      <p>{item.tagline}</p>
+                      <div className="card-record">
+                        <span>BEST</span>
+                        <b>
+                          {record?.bestTime
+                            ? `${timeLabel(record.bestTime)} s`
+                            : "— —"}
+                        </b>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="select-footer">
+                <div className="stage-detail">
+                  <span>
+                    <Flag size={14} /> {guideLabel(chosen.guide)}
+                  </span>
+                  <p>{chosen.hint}</p>
+                </div>
+                <button className="primary" onClick={() => start(selected)}>
+                  STAGE 0{selected + 1} 달리기 <ArrowRight size={20} />
                 </button>
-                {immersive && (
-                  <button className="secondary" onClick={exit}>
-                    타이틀로 돌아가기
-                  </button>
-                )}
-                <small>Space / Esc로 계속하기</small>
+              </div>
+              <div className="select-bottom">
+                <span>{totalClears} / 5 RUNS COMPLETE</span>
+                <span>
+                  ← → 선택 <kbd>Enter</kbd> 시작
+                </span>
               </div>
             </div>
           )}
-          {["clear", "over"].includes(state.phase) && !help && (
-            <div className="overlay result-overlay">
-              <div className="modal result">
-                <span
-                  className={`result-icon ${state.phase === "over" ? "failed" : ""}`}
-                >
-                  {state.phase === "clear" ? (
-                    <Trophy size={27} />
-                  ) : (
-                    <RotateCcw size={27} />
-                  )}
-                </span>
+          {state.phase === "paused" && !modalOpen && (
+            <div className="overlay">
+              <div
+                className="modal pause-modal"
+                ref={dialog}
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                aria-label="일시정지"
+              >
+                <span className="eyebrow">TAKE A BREATHER</span>
+                <h2>잠깐, 숨 고르기.</h2>
+                <p>다음 점프는 당신의 타이밍에.</p>
+                <button className="primary" onClick={togglePause}>
+                  계속 달리기 <Play size={19} />
+                </button>
+                <div className="pause-actions">
+                  <button
+                    className="secondary"
+                    onClick={() => start(state.stage)}
+                  >
+                    <RotateCcw size={17} /> 재시작
+                  </button>
+                  <button className="secondary" onClick={selectStages}>
+                    스테이지 선택 <ArrowRight size={17} />
+                  </button>
+                </div>
+                <div className="pause-options">
+                  <button className="text-button" onClick={changeSound}>
+                    {preferences.muted ? (
+                      <VolumeX size={17} />
+                    ) : (
+                      <Volume2 size={17} />
+                    )}{" "}
+                    사운드 {preferences.muted ? "OFF" : "ON"}
+                  </button>
+                  <button className="text-button" onClick={full}>
+                    <Maximize2 size={16} /> 전체 화면
+                  </button>
+                  <button
+                    className="text-button"
+                    onClick={() => setSettings(true)}
+                  >
+                    <Settings2 size={16} /> 설정
+                  </button>
+                </div>
+                <label className="hint-option">
+                  <input
+                    type="checkbox"
+                    checked={hint}
+                    onChange={(event) => {
+                      setHint(event.target.checked);
+                      engine.current?.setHint(event.target.checked);
+                    }}
+                  />
+                  <span>접선 힌트 켜기</span>
+                  <small>필요할 때만 길의 방향을 확인하세요.</small>
+                </label>
+                <small className="keyboard-note">
+                  <kbd>Esc</kbd> 계속 <span /> <kbd>R</kbd> 재시작
+                </small>
+              </div>
+            </div>
+          )}
+          {state.phase === "clear" && !modalOpen && (
+            <div className="result-overlay">
+              <div className="trace-caption">
                 <span className="eyebrow">
-                  {state.phase === "clear"
-                    ? "MISSION COMPLETE"
-                    : "ONE MORE CURVE?"}
+                  <i /> YOUR TRACE
+                </span>
+                <h2>이것이 당신의 자취.</h2>
+                <p>한 번의 질주, 하나의 그림.</p>
+                <span className="trace-key">
+                  <i /> RUN <i /> FLIGHT
+                </span>
+              </div>
+              <div className="result-panel">
+                <span className="eyebrow">
+                  <Trophy size={15} /> RUN COMPLETE / 0{state.stage + 1}
                 </span>
                 <h2>
-                  {state.phase === "clear" ? "NICE RUN!" : "다시, 한 번 더."}
+                  CLEAR<span>!</span>
                 </h2>
-                <p>
-                  {state.phase === "clear"
-                    ? "모든 CORE를 열고 스카이라인을 돌파했습니다."
-                    : state.failure || "다음 곡선으로 다시 돌파해 보세요."}
-                </p>
-                <div className="result-score">
-                  <span>FINAL SCORE</span>
-                  <strong>{state.score.toLocaleString()}</strong>
+                <div className="finish-time">
+                  <strong>
+                    {timeLabel(state.time)}
+                    <small>s</small>
+                  </strong>
+                  {state.newBest && <span>NEW BEST</span>}
                 </div>
                 <div className="result-stats">
                   <div>
+                    <span>COIN</span>
+                    <b>
+                      {state.coins}
+                      <small> / {state.totalCoins}</small>
+                    </b>
+                  </div>
+                  <div>
+                    <span>JUMP</span>
+                    <b>{state.jumps}</b>
+                  </div>
+                  <div>
+                    <span>PERFECT TANGENT</span>
+                    <b>×{state.perfects}</b>
+                  </div>
+                  <div>
+                    <span>PERFECT LANDING</span>
+                    <b>×{state.perfectLandings}</b>
+                  </div>
+                  <div>
                     <span>MAX COMBO</span>
-                    <strong>×{state.maxCombo}</strong>
+                    <b>×{state.maxCombo}</b>
                   </div>
                   <div>
-                    <span>PERFECT</span>
-                    <strong>{state.perfects}</strong>
-                  </div>
-                  <div>
-                    <span>HITS</span>
-                    <strong>{state.kills}</strong>
-                  </div>
-                  <div>
-                    <span>CORE</span>
-                    <strong>
-                      {state.cores}/{REQUIRED_CORES}
-                    </strong>
+                    <span>SCORE</span>
+                    <b>{state.score.toLocaleString()}</b>
                   </div>
                 </div>
-                <button className="primary" onClick={start}>
-                  다시 달리기 <RotateCcw size={18} />
-                </button>
-                {immersive && (
-                  <button className="secondary" onClick={exit}>
-                    타이틀로 돌아가기
+                <div className="result-best">
+                  <span>BEST TIME</span>
+                  <b>{timeLabel(state.bestTime ?? state.time)} s</b>
+                  <span>MISS {state.misses}</span>
+                </div>
+                <div className="slope-feedback">
+                  <span>LAST JUMP</span>
+                  <b>
+                    {Math.abs(state.lastSlope) < 0.12
+                      ? "Zero slope →"
+                      : state.lastSlope > 0
+                        ? "Positive slope ↗"
+                        : "Negative slope ↘"}
+                  </b>
+                  <small>
+                    x = {state.lastJumpX.toFixed(1)} · slope{" "}
+                    {state.lastSlope.toFixed(2)}
+                  </small>
+                </div>
+                {state.stage < STAGES.length - 1 && (
+                  <button
+                    className="primary"
+                    onClick={() => start(state.stage + 1)}
+                  >
+                    다음 스테이지 <ArrowRight size={18} />
                   </button>
                 )}
-                <small>
-                  최고 기록 {Math.max(best, state.score).toLocaleString()} ·
-                  Enter / R로 즉시 재도전
-                </small>
+                <div className="result-actions">
+                  <button
+                    className="secondary"
+                    onClick={() => start(state.stage)}
+                  >
+                    <RotateCcw size={16} /> 다시 달리기
+                  </button>
+                  <button className="secondary" onClick={selectStages}>
+                    스테이지 <ArrowUpRight size={16} />
+                  </button>
+                </div>
               </div>
             </div>
           )}
           {help && (
             <div className="overlay">
-              <div className="modal guide">
+              <div
+                className="modal guide-modal"
+                ref={dialog}
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                aria-label="플레이 가이드"
+              >
                 <button
-                  className="close-guide"
-                  aria-label="가이드 닫기"
+                  className="close-modal icon-button"
+                  aria-label="조작법 닫기"
                   onClick={() => setHelp(false)}
                 >
                   <X size={20} />
                 </button>
-                <span className="eyebrow">HOW TO FLOW</span>
-                <h2>보이는 곡선대로, 움직이세요.</h2>
+                <span className="eyebrow">ONE TAP. THAT'S IT.</span>
+                <h2>곡선을 보고, 탭.</h2>
                 <p>
-                  HAZARD는 피하고, ENEMY는 보너스. CORE를 깨면 연결된 문이
-                  열립니다.
+                  자동으로 달립니다. 탭하는 순간,
+                  <br />
+                  발밑 길이 향하는 방향으로 날아갑니다.
                 </p>
-                <div className="guide-skills">
-                  {(Object.keys(SKILLS) as Skill[]).map((k) => (
-                    <div key={k} style={{ color: SKILLS[k].color }}>
-                      <Graph skill={k} />
-                      <div>
-                        <strong>
-                          <kbd>{SKILLS[k].key}</kbd> {SKILLS[k].name}
-                        </strong>
-                        <span>{SKILLS[k].hint}</span>
-                      </div>
-                    </div>
-                  ))}
+                <div className="direction-guide">
+                  <div>
+                    <span>↗</span>
+                    <b>오르막</b>
+                    <small>위로 날아가기</small>
+                  </div>
+                  <div>
+                    <span>→</span>
+                    <b>평평한 길</b>
+                    <small>옆으로 날아가기</small>
+                  </div>
+                  <div>
+                    <span>↘</span>
+                    <b>내리막</b>
+                    <small>아래로 날아가기</small>
+                  </div>
                 </div>
                 <p className="guide-note">
-                  공중에서 시작한 급강하만 충격판과 금 간 바닥을 부숩니다. 지상
-                  급강하는 짧은 공격입니다. 적은 놓쳐도 계속 달립니다. 붉은
-                  위험물과 닫힌 문에 충돌하면 HP가 줄어듭니다.
+                  코인을 모으고, 붉은 장애물을 피해서 깃발까지.
+                  <br />
+                  어디에서 뛰느냐에 따라 당신의 길이 달라집니다.
                 </p>
-                <button
-                  className="primary"
-                  onClick={() => {
-                    setHelp(false);
-                    if (state.phase === "paused") engine.current?.togglePause();
-                  }}
-                >
-                  준비됐어요 <ChevronRight size={19} />
+                <div className="guide-controls">
+                  <span>
+                    <kbd>Space</kbd> / 화면 탭 : 점프
+                  </span>
+                  <span>
+                    <kbd>P</kbd> / <kbd>Esc</kbd> : 일시정지
+                  </span>
+                  <span>
+                    <kbd>R</kbd> : 바로 재시작
+                  </span>
+                </div>
+                <button className="primary" onClick={() => setHelp(false)}>
+                  알겠어요 <Check size={18} />
                 </button>
               </div>
             </div>
           )}
-          {immersive && (
-            <MobileSkills
-              active={state.skill}
-              queued={state.bufferedSkill}
-              enabled={playable}
-              cast={(skill) => engine.current?.cast(skill)}
-            />
-          )}
-          <div className="stage-bottom">
-            <span>
-              <span className="live-dot" />
-              {state.phase === "ready"
-                ? "ROOFTOP DISTRICT"
-                : state.phase === "playing"
-                  ? chapter.tip
-                  : state.phase === "clear"
-                    ? "곡선으로 만든 당신의 첫 번째 러시"
-                    : "다음 움직임을 준비하세요."}
-            </span>
-            <span>01 — SEOUL SKYLINE</span>
-          </div>
-        </section>
-        <section className="controls" aria-label="함수 기술">
-          <div className="control-heading">
-            <span>
-              <span className="tiny-slash" /> CHOOSE YOUR MOVE
-            </span>
-            <small>
-              <span className="pc-hint">
-                키보드 <kbd>1</kbd>–<kbd>4</kbd> 또는{" "}
-              </span>
-              버튼을 탭하세요
-              <ChevronRight size={13} />
-            </small>
-          </div>
-          <div className="skill-grid">
-            {(Object.keys(SKILLS) as Skill[]).map((k) => (
-              <button
-                key={k}
-                className={`skill skill-${k} ${state.skill === k ? "active" : ""}`}
-                style={{ "--skill": SKILLS[k].color } as React.CSSProperties}
-                disabled={!playable}
-                aria-label={`${SKILLS[k].key} ${SKILLS[k].formula} ${SKILLS[k].name}`}
-                onPointerDown={(e) => {
-                  if (e.button !== 0) return;
-                  e.preventDefault();
-                  engine.current?.cast(k);
-                }}
-                onClick={(e) => {
-                  if (e.detail === 0) engine.current?.cast(k);
-                }}
+          {settings && (
+            <div className="overlay">
+              <div
+                className="modal settings-modal"
+                ref={dialog}
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                aria-label="플레이 설정"
               >
-                <span className="skill-number">0{SKILLS[k].key}</span>
-                <Graph skill={k} className="skill-graph" />
-                <span className="skill-text">
-                  <strong>{SKILLS[k].formula}</strong>
-                  <span>{SKILLS[k].name}</span>
-                </span>
-                <kbd>{SKILLS[k].key}</kbd>
-                <span className="skill-indicator" />
-              </button>
-            ))}
-          </div>
-          <div className="control-footer">
-            <span>
-              <Zap size={13} /> 타이밍을 맞추면 PERFECT, 흐름을 이으면 COMBO.
-            </span>
-            <span>
-              <AudioLines size={14} /> SOUND ON FOR THE FEEL
-            </span>
-          </div>
+                <button
+                  className="close-modal icon-button"
+                  aria-label="설정 닫기"
+                  onClick={() => setSettings(false)}
+                >
+                  <X size={20} />
+                </button>
+                <span className="eyebrow">MAKE IT YOURS</span>
+                <h2>플레이 설정</h2>
+                <button
+                  className="setting-row"
+                  onClick={changeSound}
+                  role="switch"
+                  aria-checked={!preferences.muted}
+                  aria-label="사운드"
+                >
+                  <span>
+                    {preferences.muted ? (
+                      <VolumeX size={22} />
+                    ) : (
+                      <Volume2 size={22} />
+                    )}
+                    <span>
+                      <b>사운드</b>
+                      <small>점프·코인·착지 효과음</small>
+                    </span>
+                  </span>
+                  <span
+                    className={`toggle ${!preferences.muted ? "on" : ""}`}
+                    aria-hidden="true"
+                  >
+                    <i />
+                  </span>
+                </button>
+                <button
+                  className="setting-row"
+                  onClick={changeMotion}
+                  role="switch"
+                  aria-checked={preferences.reducedMotion}
+                  aria-label="화면 움직임 줄이기"
+                >
+                  <span>
+                    <Zap size={22} />
+                    <span>
+                      <b>화면 움직임 줄이기</b>
+                      <small>흔들림과 번쩍임을 편안하게</small>
+                    </span>
+                  </span>
+                  <span
+                    className={`toggle ${preferences.reducedMotion ? "on" : ""}`}
+                    aria-hidden="true"
+                  >
+                    <i />
+                  </span>
+                </button>
+                <button className="secondary fullscreen-setting" onClick={full}>
+                  <Maximize2 size={18} />{" "}
+                  {fullscreen ? "전체 화면 나가기" : "전체 화면"}
+                </button>
+                <button className="primary" onClick={() => setSettings(false)}>
+                  완료 <Check size={18} />
+                </button>
+                <small className="settings-note">
+                  설정과 최고 기록은 이 기기에 저장됩니다.
+                </small>
+              </div>
+            </div>
+          )}
+          {portrait && (
+            <div
+              className="rotate-screen"
+              ref={dialog}
+              tabIndex={-1}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="rotate-title"
+            >
+              <div className="rotate-icon">
+                <Smartphone size={52} />
+                <RotateCcw size={24} />
+              </div>
+              <span className="eyebrow">A LITTLE MORE ROOM TO FLY</span>
+              <h2 id="rotate-title">휴대폰을 가로로 돌려주세요.</h2>
+              <p>더 넓은 길에서, 더 멋진 자취를.</p>
+              <span className="rotate-brand">
+                SUPER FUNCTION <b>HERO</b>
+              </span>
+            </div>
+          )}
         </section>
       </div>
       <section className="below">
-        <div className="design-note">
-          <span>THE RULE IS SIMPLE</span>
+        <div>
+          <span className="note-number">01</span>
           <p>
-            수학을 푸는 대신,
-            <br />
-            <strong>수학으로 움직이세요.</strong>
+            <b>달리기는 자동.</b>
+            <span>점프의 타이밍은 당신의 것.</span>
           </p>
         </div>
-        <div className="feature-note">
-          <span className="note-number">01</span>
-          <div>
-            <strong>보고, 누르고, 날아오르기.</strong>
-            <p>
-              함수 이름을 몰라도 괜찮아요.
-              <br />
-              그래프 모양이 다음 움직임의 힌트입니다.
-            </p>
-          </div>
-        </div>
-        <div className="feature-note">
+        <div>
           <span className="note-number">02</span>
-          <div>
-            <strong>좋은 곡선은 좋은 콤보로.</strong>
-            <p>
-              어퍼컷에서 내려찍기로, 대시에서 웨이브로.
-              <br />
-              끊기지 않는 흐름을 찾아보세요.
-            </p>
-          </div>
+          <p>
+            <b>길의 모양이 힌트.</b>
+            <span>기울기를 느끼며 다음 착지를 그려보세요.</span>
+          </p>
         </div>
-        <div className="best-record">
-          <Trophy size={18} />
-          <span>LOCAL BEST</span>
-          <strong>{best.toLocaleString().padStart(4, "0")}</strong>
+        <div className="local-record">
+          <Trophy size={19} />
+          <p>
+            <span>YOUR JOURNEY</span>
+            <b>
+              {totalClears}
+              <small> / 5 STAGES</small>
+            </b>
+          </p>
         </div>
       </section>
       <footer className="footer">
@@ -536,79 +860,9 @@ export default function App() {
           SUPER FUNCTION HERO <b>© 2026</b>
         </span>
         <span>
-          FOUR FUNCTIONS. INFINITE FLOW.<i>↗</i>
+          LEAVE YOUR TRACE. <ArrowUpRight size={15} />
         </span>
       </footer>
-      {import.meta.env.DEV && (
-        <div className="debug">
-          <button className="debug-toggle" onClick={() => setDebug(!debug)}>
-            DEV {debug ? "−" : "+"}
-          </button>
-          {debug && (
-            <div className="debug-panel">
-              <code>
-                {state.fps.toFixed(0)} FPS · x {state.x.toFixed(1)} / y{" "}
-                {state.y.toFixed(1)}
-                <br />
-                {state.skill ?? state.motion} · {state.time.toFixed(2)}s
-              </code>
-              <label>
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    if (engine.current)
-                      engine.current.debug.hitboxes = e.target.checked;
-                  }}
-                />
-                Hitboxes
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    if (engine.current)
-                      engine.current.debug.invincible = e.target.checked;
-                  }}
-                />
-                무적
-              </label>
-              <label>
-                이동 속도
-                <select
-                  defaultValue="1"
-                  onChange={(e) => {
-                    if (engine.current)
-                      engine.current.debug.speed = Number(e.target.value);
-                  }}
-                >
-                  <option value="0.5">0.5×</option>
-                  <option value="1">1×</option>
-                  <option value="1.5">1.5×</option>
-                  <option value="2">2×</option>
-                </select>
-              </label>
-              <div className="debug-actions">
-                <button onClick={() => engine.current?.spawn("bot")}>
-                  지상 적
-                </button>
-                <button onClick={() => engine.current?.spawn("drone")}>
-                  공중 적
-                </button>
-                <button onClick={() => engine.current?.spawn("spike")}>
-                  장애물
-                </button>
-              </div>
-              <div className="debug-actions">
-                {(Object.keys(SKILLS) as Skill[]).map((k) => (
-                  <button key={k} onClick={() => engine.current?.cast(k)}>
-                    {SKILLS[k].formula}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </main>
   );
 }
